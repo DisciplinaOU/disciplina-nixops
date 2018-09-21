@@ -31,6 +31,10 @@ in
     buildkite-agent = {
       enable = true;
 
+      extraConfig = ''
+        no-pty=true
+      '';
+
       meta-data = "system=${builtins.currentSystem}";
 
       openssh = {
