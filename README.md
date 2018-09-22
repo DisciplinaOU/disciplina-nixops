@@ -13,7 +13,7 @@ compared to NixOS.
 
 1. Sign up for [MacStadium][] and rent a server.
 
-2. Copy `buildkite-token` to the newly provisioned server:
+2. Copy `keys/buildkite-token` to the newly provisioned server:
 ```sh
 scp keys/buildkite-token administrator@darwin-builder
 ```
@@ -52,10 +52,10 @@ nix-channel --update
 ```nix
 {
   imports = [
-    <disciplina-nixops/profiles/darwin-builder.nix>
+    <disciplina-nixops/deployments/darwin-builder.nix>
   ];
 
-  # number of hyperthreads on the machine
+  # sysctl -n hw.ncpu
   nix.buildCores = 4;
   nix.maxJobs = 4;
 
