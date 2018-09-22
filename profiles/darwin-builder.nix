@@ -43,7 +43,7 @@ in
       };
 
       package = pkgs.buildkite-agent3;
-      runtimePackages = [ pkgs.nix ];
+      runtimePackages = with pkgs; [ gnutar nix ];
       tokenPath = "${secrets}/buildkite-token";
     };
 
