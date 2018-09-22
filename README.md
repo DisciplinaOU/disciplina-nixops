@@ -1,13 +1,11 @@
 # Disciplina operations
 
-## Deployments
-
-### Darwin builder
+## Darwin builder
 
 [nix-darwin][] profile for macOS builder. Runs Buildkite to make CI provide
 macOS apps on each pull request for QA team.
 
-#### Provisioning
+### Provisioning
 
 Darwin builder is the hardest of all three to provision because there's no
 [NixOps][] support and [nix-darwin][] provides relatively little control when
@@ -76,18 +74,18 @@ darwin-rebuild switch
 [NixOps]: https://nixos.org/nixops
 [nix-darwin]: https://github.com/LnL7/nix-darwin
 
-### Deployer
+## Deployer
 
 Singleton entity that is used to provision cluster in one-to-many relationship.
 Runs Buildkite to CD cluster on each GitHub push, and to make CI provide Flatpak
 bundles and some other miscellaneous artifacts.
 
-#### Provisioning
+### Provisioning
 
 ```sh
 nix-shell --argstr accessKeyId production --run 'nixops deploy -d deployer -s keys/deployer.nixops'
 ```
 
-### Cluster
+## Cluster
 
 Actual Disciplina cluster. Work in progress.
