@@ -10,8 +10,8 @@ cat .gitconfig >> .git/config
 
 ## Darwin builder
 
-[nix-darwin][] profile for macOS builder. Runs Buildkite to make CI provide
-macOS apps on each pull request for QA team.
+[nix-darwin][] profile for macOS builder. Runs Buildkite to build macOS apps on
+CI for QA team.
 
 ### Provisioning
 
