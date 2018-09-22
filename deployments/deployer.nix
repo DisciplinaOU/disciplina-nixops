@@ -15,7 +15,10 @@
       securityGroups = [ resources.ec2SecurityGroups.deployer-ssh.name ];
     };
 
-    deployment.keys.buildkite-token.keyFile = ../keys/buildkite-token;
+    deployment.keys = {
+      aws-credentials.keyFile = ../keys/aws-credentials;
+      buildkite-token.keyFile = ../keys/buildkite-token;
+    };
 
     networking.hostName = "disciplina-deployer";
 
@@ -44,7 +47,7 @@
 
   resources.ec2KeyPairs.deployer-key = { inherit region; };
 
-  resources.ec2SecurityGroups.deployer-ssh = { resources, ... }: {
+  resources.ec2SecurityGroups.deployer-ssh = {
     inherit region;
     rules = [{
       fromPort = 22;
