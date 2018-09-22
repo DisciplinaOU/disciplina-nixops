@@ -3,8 +3,6 @@
 
 let
   nix-build-wrapper = writeShellScriptBin "nix-build" ''
-    #!${stdenv.shell} -e
-
     export PATH=${nix}/bin:$PATH
 
     for path in $(nix-build "$@"); do
