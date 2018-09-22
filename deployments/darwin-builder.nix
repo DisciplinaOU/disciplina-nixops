@@ -23,6 +23,8 @@ in
     # useSandbox = true;
   };
 
+  nixpkgs.overlays = [ (import ../pkgs) ];
+
   programs.bash.enable = true;
 
   services = {
