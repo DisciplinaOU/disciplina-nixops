@@ -70,6 +70,7 @@ darwin-rebuild switch
 
 10. Update `state/darwin-builder.ssh` (in this repo) with the new IP.
 
+[MacStadium]: https://www.macstadium.com
 [Nix]: https://nixos.org/nix
 [NixOps]: https://nixos.org/nixops
 [nix-darwin]: https://github.com/LnL7/nix-darwin
