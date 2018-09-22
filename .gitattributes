@@ -1,3 +1,3 @@
 keys/* filter=git-crypt diff=git-crypt
-state/*.nixops filter=git-crypt diff=git-crypt+sqlite3
 state/* filter=git-crypt diff=git-crypt
+state/*.nixops filter=git-crypt diff=git-crypt+sqlite3

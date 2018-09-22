@@ -1,2 +1,2 @@
 [diff "git-crypt+sqlite3"]
-	textconv = git-crypt diff | sqlite3 /dev/stdin .dump
+	textconv = sh -c 'git-crypt diff $0 | sqlite3 $0 .dump'
