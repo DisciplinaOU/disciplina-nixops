@@ -51,8 +51,8 @@ in
   };
 
   system.activationScripts.postActiation.text = ''
-    mkdir -p ${config.users.users.buildkite-agent.home}
-    chown buildkite-agent:buildkite-agent ${config.users.users.buildkite-agent.home}
+    mkdir -p ${config.users.users.buildkite-agent.home}/.cache/nix
+    chown -R buildkite-agent:buildkite-agent ${config.users.users.buildkite-agent.home}
     chmod 770 ${config.users.users.buildkite-agent.home}
   '';
 }
