@@ -5,5 +5,9 @@ let
 in
 
 {
-  nixops = callPackage ./nixops {};
+  nix-with-cachix = callPackage ./nix-with-cachix {};
+
+  nixops = callPackage ./nixops {
+    inherit (previous) nixops;
+  };
 }
