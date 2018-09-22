@@ -12,7 +12,7 @@
       ebsInitialRootDiskSize = 256;
       instanceType = "t2.xlarge";
       keyPair = resources.ec2KeyPairs.deployer-key;
-      securityGroups = [ resources.ec2SecurityGroups.deployer-ssh.name ];
+      securityGroups = [ resources.ec2SecurityGroups.deployer-ssh ];
     };
 
     deployment.keys.buildkite-token.keyFile = ../keys/buildkite-token;
@@ -34,17 +34,15 @@
       enable = true;
       package = pkgs.buildkite-agent3;
       runtimePackages = with pkgs; [ bash gnutar nix ];
-      tags = lib.concatStringsSep "," [
-        "hostname=${config.networking.hostName}"
-        "system=${builtins.currentSystem}"
-      ];
       tokenPath = "/run/keys/buildkite-token";
+      # populate os (linux, darwin, windows), hostname, machine-id (/etc/machine-id)
+      extraConfig = "tags-from-host=true";
     };
   };
 
   resources.ec2KeyPairs.deployer-key = { inherit region; };
 
-  resources.ec2SecurityGroups.deployer-ssh = { resources, ... }: {
+  resources.ec2SecurityGroups.deployer-ssh = {
     inherit region;
     rules = [{
       fromPort = 22;
