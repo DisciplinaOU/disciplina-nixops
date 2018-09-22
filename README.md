@@ -86,7 +86,7 @@ Flatpak bundles, LaTeX documents and HTML documentation as part of CI pipeline.
 ### Provisioning
 
 ```sh
-nix-shell --argstr accessKeyId production --run 'nixops deploy -d deployer -s keys/deployer.nixops'
+nix-shell --argstr accessKeyId production --run 'nixops deploy -d deployer -s state/deployer.nixops'
 ```
 
 ## Cluster
