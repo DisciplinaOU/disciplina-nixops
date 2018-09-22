@@ -34,10 +34,8 @@
       enable = true;
       package = pkgs.buildkite-agent3;
       runtimePackages = with pkgs; [ bash gnutar nix ];
-      tags = lib.concatStringsSep "," [
-        "system=${pkgs.system}"
-      ];
       tokenPath = "/run/keys/buildkite-token";
+      # populate os (linux, darwin, windows), hostname, machine-id (/etc/machine-id)
       extraConfig = "tags-from-host=true";
     };
   };
