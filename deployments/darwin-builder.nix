@@ -35,12 +35,6 @@ in
 
       meta-data = "system=${pkgs.system}";
 
-      # ssh-keygen -t ed25519
-      openssh = {
-        privateKeyPath = "${secrets}/.ssh/id_ed25519";
-        publicKeyPath = "${secrets}/.ssh/id_ed25519.pub";
-      };
-
       package = pkgs.buildkite-agent3;
       runtimePackages = with pkgs; [ bash gnutar nix ];
       tokenPath = "${secrets}/buildkite-token";

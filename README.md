@@ -31,32 +31,26 @@ scp keys/buildkite-token administrator@darwin-builder
 ssh administrator@darwin-builder
 ```
 
-4. Generate Ed25519 SSH key (just pick defaults):
-```sh
-ssh-keygen -t ed25519
-```
-
-TODO: fork [nix-darwin][] and update buildkite-agent module to remove this step
-
-5. Install [Nix][]:
+4. Install [Nix][]:
 ```sh
 curl https://nixos.org/nix/install | sh
 ```
 
-6. Install [nix-darwin][]:
+5. Install [nix-darwin][]:
 ```sh
 nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
 ./result/bin/darwin-installer
 ```
 
-7. Set up our Nix channels:
+6. Set up our Nix channels:
 ```sh
 nix-channel --add https://github.com/serokell/nixpkgs/archive/master.tar.gz nixpkgs
+nix-channel --add https://github.com/serokell/nix-darwin/archive/master.tar.gz darwin
 nix-channel --add https://github.com/DisciplinaOU/disciplina-nixops/archive/master.tar.gz disciplina-nixops
 nix-channel --update
 ```
 
-8. Update `~/.nixpkgs/darwin-configuration.nix` to the effect of:
+7. Update `~/.nixpkgs/darwin-configuration.nix` to the effect of:
 ```nix
 {
   imports = [
@@ -71,12 +65,12 @@ nix-channel --update
 }
 ```
 
-9. Rebuild:
+8. Rebuild:
 ```sh
 darwin-rebuild switch
 ```
 
-10. Update `state/darwin-builder.ssh` (in this repo) with the new IP.
+9. Update `state/darwin-builder.ssh` (in this repo) with the new IP.
 
 [MacStadium]: https://www.macstadium.com
 [Nix]: https://nixos.org/nix
