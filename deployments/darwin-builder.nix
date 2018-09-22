@@ -38,7 +38,7 @@ in
       meta-data = "system=${pkgs.system}";
 
       package = pkgs.buildkite-agent3;
-      runtimePackages = with pkgs; [ bash gnutar nix ];
+      runtimePackages = with pkgs; [ bash gnutar nix-with-cachix ];
       tokenPath = "${secrets}/buildkite-token";
     };
 
