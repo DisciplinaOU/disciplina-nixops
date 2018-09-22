@@ -46,7 +46,7 @@ curl https://nixos.org/nix/install | sh
 6. Install [nix-darwin][]:
 ```sh
 nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
-
+./result/bin/darwin-installer
 ```
 
 7. Set up our Nix channels:
