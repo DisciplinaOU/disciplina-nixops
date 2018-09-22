@@ -10,7 +10,7 @@ in
 
 stdenv.mkDerivation {
   name = "disciplina-nixops";
-  nativeBuildInputs = [ git-crypt nixops ];
+  nativeBuildInputs = [ git-crypt nixops sqlite ];
 
   AWS_ACCESS_KEY_ID = accessKeyId;
 
