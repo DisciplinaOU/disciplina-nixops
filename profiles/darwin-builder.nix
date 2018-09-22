@@ -1,8 +1,6 @@
 { config, pkgs, ... }:
 
 let
-  # Impure, requires MacStadium and some setup:
-  # $ ssh-keygen -t ed25519
   secrets = "/Users/administrator";
 in
 
@@ -20,7 +18,7 @@ in
 
     package = pkgs.nix;
 
-    # Doesn't work because buildkite-agent3 doesn't build due to Go impurely
+    # TODO: doesn't work, buildkite-agent3 doesn't build due to Go impurely
     # depending on CoreFoundation framework. Should be fixed in our Nixpkgs.
     # useSandbox = true;
   };
@@ -37,6 +35,7 @@ in
 
       meta-data = "system=${builtins.currentSystem}";
 
+      # ssh-keygen -t ed25519
       openssh = {
         privateKeyPath = "${secrets}/.ssh/id_ed25519";
         publicKeyPath = "${secrets}/.ssh/id_ed25519.pub";
