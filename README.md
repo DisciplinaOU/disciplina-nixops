@@ -1,4 +1,12 @@
-# Disciplina operations
+Primary Disciplina deployment specification.
+
+To set up this repo, run:
+
+```sh
+nix-shell
+git crypt unlock
+cat .gitconfig >> .git/config
+```
 
 ## Darwin builder
 

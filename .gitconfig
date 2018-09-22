@@ -1,0 +1,2 @@
+[diff "git-crypt+sqlite3"]
+	textconv = git-crypt diff | sqlite3 /dev/stdin .dump
