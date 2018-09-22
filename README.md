@@ -79,9 +79,9 @@ darwin-rebuild switch
 
 ## Deployer
 
-Singleton entity that is used to provision cluster in one-to-many relationship.
-Runs Buildkite to CD cluster on each GitHub push, and also provides Flatpak
-bundles and some other miscellaneous artifacts as part of CI pipeline.
+Singleton entity that is used to provision clusters in one-to-many
+relationship. Runs Buildkite to CD clusters on each GitHub push, and to build
+Flatpak bundles, LaTeX documents and HTML documentation as part of CI pipeline.
 
 ### Provisioning
 
