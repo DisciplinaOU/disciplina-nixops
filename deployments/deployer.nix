@@ -33,6 +33,8 @@
       ];
     };
 
+    nixpkgs.overlays = [ (import ../pkgs) ];
+
     services.buildkite-agent = {
       enable = true;
       package = pkgs.buildkite-agent3;
