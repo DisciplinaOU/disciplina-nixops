@@ -1,1 +1,2 @@
 keys/* filter=git-crypt diff=git-crypt
+state/* filter=git-crypt diff=git-crypt
