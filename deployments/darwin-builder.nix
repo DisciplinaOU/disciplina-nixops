@@ -33,7 +33,7 @@ in
         no-pty=true
       '';
 
-      meta-data = "system=${builtins.currentSystem}";
+      meta-data = "system=${pkgs.system}";
 
       # ssh-keygen -t ed25519
       openssh = {

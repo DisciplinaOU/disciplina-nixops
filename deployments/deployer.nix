@@ -36,7 +36,7 @@
       runtimePackages = with pkgs; [ bash gnutar nix ];
       tags = lib.concatStringsSep "," [
         "hostname=${config.networking.hostName}"
-        "system=${builtins.currentSystem}"
+        "system=${pkgs.system}"
       ];
       tokenPath = "/run/keys/buildkite-token";
     };
