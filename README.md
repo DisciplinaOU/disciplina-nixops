@@ -23,12 +23,12 @@ compared to NixOS.
 
 2. Copy `keys/buildkite-token` to the newly provisioned server:
 ```sh
-scp keys/buildkite-token administrator@darwin-builder
+scp keys/buildkite-token administrator@1.2.3.4
 ```
 
 3. SSH to the server (default password is in the MacStadium ticket):
 ```sh
-ssh administrator@darwin-builder
+ssh administrator@1.2.3.4
 ```
 
 4. Install [Nix][]:
