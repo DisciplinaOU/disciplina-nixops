@@ -36,7 +36,7 @@
     services.buildkite-agent = {
       enable = true;
       package = pkgs.buildkite-agent3;
-      runtimePackages = with pkgs; [ bash gnutar nix ];
+      runtimePackages = with pkgs; [ bash gnutar nix-with-cachix ];
       tags = lib.concatStringsSep "," [
         "hostname=${config.networking.hostName}"
         "system=${pkgs.system}"
