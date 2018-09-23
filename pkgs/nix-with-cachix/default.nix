@@ -15,6 +15,12 @@ let
         fi
       done
 
+      for requisite in $(nix-store -qR $deriver); do
+        if [ "$(nix-store -qd $requisite)" != "unknown-deriver" ]; then
+          echo $requisite >> $outputs
+        fi
+      done
+
       if [ -n "$CACHIX_NAME" ]; then
         ${cachix}/bin/cachix push $CACHIX_NAME < $outputs
       fi
