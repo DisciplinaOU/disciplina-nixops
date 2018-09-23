@@ -19,6 +19,7 @@
       aws-credentials.keyFile = ../keys/aws-credentials;
       buildkite-token.keyFile = ../keys/buildkite-token;
       committee-secret.keyFile = ../keys/committee-secret;
+      faucet-secret.keyFile = ../keys/faucet-secret;
     };
 
     networking.hostName = "disciplina-deployer";
