@@ -40,11 +40,15 @@
     services.buildkite-agent = {
       enable = true;
       package = pkgs.buildkite-agent3;
+
       runtimePackages = with pkgs; [ bash gnutar nix-with-cachix ];
+
+      # TODO: make into an attrset
       tags = lib.concatStringsSep "," [
         "hostname=${config.networking.hostName}"
         "system=${pkgs.system}"
       ];
+
       tokenPath = "/run/keys/buildkite-token";
     };
   };
