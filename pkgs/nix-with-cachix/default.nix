@@ -6,20 +6,11 @@ let
     export PATH=${nix}/bin:$PATH
 
     for path in $(nix-build "$@"); do
-      deriver=$(nix show-derivation $path | ${jq}/bin/jq -r 'keys | .[0]')
-      outputs=$(mktemp)
-
-      for requisite in $(nix-store -qR --include-outputs $deriver); do
-        if [ "$(nix-store -qd $requisite)" != "unknown-deriver" ]; then
-          echo $requisite >> $outputs
-        fi
-      done
+      deriver=$(nix show-derivation $path | ${jq}/bin/jq -r "keys | .[0]")
 
       if [ -n "$CACHIX_NAME" ]; then
-        ${cachix}/bin/cachix push $CACHIX_NAME < $outputs
+        nix-store -qR --include-outputs $deriver | ${cachix}/bin/cachix push $CACHIX_NAME
       fi
-
-      rm $outputs
     done
   '';
 in
