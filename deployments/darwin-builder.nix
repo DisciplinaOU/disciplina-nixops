@@ -58,5 +58,11 @@ in
   users = {
     knownGroups = [ "buildkite-agent" ];
     knownUsers = [ "buildkite-agent" ];
+
+    groups.buildkite-agent.gid = 532;
+    users.buildkite-agent = {
+      uid = 532;
+      gid = 532;
+    };
   };
 }
