@@ -18,6 +18,7 @@
     deployment.keys = {
       aws-credentials.keyFile = ../keys/aws-credentials;
       buildkite-token.keyFile = ../keys/buildkite-token;
+      committee-secret.keyFile = ../keys/committee-secret;
     };
 
     networking.hostName = "disciplina-deployer";
