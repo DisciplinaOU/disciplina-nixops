@@ -31,18 +31,20 @@ scp keys/buildkite-token administrator@1.2.3.4
 ssh administrator@1.2.3.4
 ```
 
-4. Install [Nix][]:
+4. Activate passwordless `sudo`: https://apple.stackexchange.com/a/333055
+
+5. Install [Nix][]:
 ```sh
 curl https://nixos.org/nix/install | sh
 ```
 
-5. Install [nix-darwin][]:
+6. Install [nix-darwin][]:
 ```sh
 nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
 result/bin/darwin-installer
 ```
 
-6. Set up our Nix channels:
+7. Set up our Nix channels:
 ```sh
 nix-channel --add https://github.com/serokell/nixpkgs/archive/master.tar.gz nixpkgs
 nix-channel --add https://github.com/serokell/nix-darwin/archive/master.tar.gz darwin
@@ -50,7 +52,7 @@ nix-channel --add https://github.com/DisciplinaOU/disciplina-nixops/archive/mast
 nix-channel --update
 ```
 
-7. Update `~/.nixpkgs/darwin-configuration.nix` to the effect of:
+8. Update `~/.nixpkgs/darwin-configuration.nix` to the effect of:
 ```nix
 {
   imports = [
@@ -65,12 +67,12 @@ nix-channel --update
 }
 ```
 
-8. Rebuild:
+9. Rebuild:
 ```sh
 darwin-rebuild switch
 ```
 
-9. Update `state/darwin-builder.ssh` (in this repo) with the new IP.
+10. Update `state/darwin-builder.ssh` (in this repo) with the new IP.
 
 [MacStadium]: https://www.macstadium.com
 [Nix]: https://nixos.org/nix
