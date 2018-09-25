@@ -3,7 +3,7 @@
 
 let
   nix-build-wrapper = writeShellScriptBin "nix-build" ''
-    set -e
+    set -eou pipefail
 
     export PATH=${nix}/bin:$PATH
 
