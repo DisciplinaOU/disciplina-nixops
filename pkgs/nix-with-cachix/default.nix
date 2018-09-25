@@ -1,5 +1,5 @@
 # For context, see: https://github.com/cachix/cachix/issues/9
-{ stdenv, symlinkJoin, writeShellScriptBin, cachix, jq, nix }:
+{ stdenv, runCommand, symlinkJoin, writeShellScriptBin, cachix, jq, nix }:
 
 let
   nix-build-wrapper = writeShellScriptBin "nix-build" ''
@@ -15,9 +15,14 @@ let
       fi
     done
   '';
+
+  nix-shell-symlink = runCommand "nix-shell" {} ''
+    mkdir -p $out/bin
+    ln -s ${nix}/bin/nix-build $out/bin/nix-shell
+  '';
 in
 
 symlinkJoin {
   name = "nix-with-cachix";
-  paths = [ nix-build-wrapper nix ];
+  paths = [ nix-build-wrapper nix-shell-symlink nix ];
 }
