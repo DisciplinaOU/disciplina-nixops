@@ -1,4 +1,4 @@
-{ pkgs ? import ./closure.nix, accessKeyId ? "staging" }: with pkgs;
+{ pkgs ? import ./pkgs.nix, accessKeyId ? "staging" }: with pkgs;
 
 let
   overlay = runCommand "nixpkgs-overlays" {} ''
