@@ -97,10 +97,17 @@ Actual Disciplina cluster. WIP.
 
 ### Provisioning
 
-Inside `nix-shell`:
+Inside `nix-shell` (or `nix-shell --argstr accessKeyId` for production):
 
 ```sh
 nixops create deployments/cluster.nix -d cluster -s state/cluster.nixops
-nixops set-args --argstr domain your-name.disciplina.site -d cluster -s state/cluster.nixops
+nixops set-args --argstr domain yourname.disciplina.site -d cluster -s state/cluster.nixops
 nixops deploy -d cluster -s state/cluster.nixops
+```
+
+Subsequent deploys should only run the last command. When you are done with
+your cluster and want to free up resources, run:
+
+```
+nixops destroy -d cluster -s state/cluster.nixops
 ```
