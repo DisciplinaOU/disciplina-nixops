@@ -97,17 +97,23 @@ Actual Disciplina cluster. WIP.
 
 ### Provisioning
 
-Inside `nix-shell` (or `nix-shell --argstr accessKeyId` for production):
+If you want to create a personal staging cluster, enter `nix-shell` and run:
 
 ```sh
-nixops create deployments/cluster.nix -d cluster -s state/cluster.nixops
-nixops set-args --argstr domain yourname.disciplina.site -d cluster -s state/cluster.nixops
-nixops deploy -d cluster -s state/cluster.nixops
+nixops create deployments/cluster.nix -d disciplina
+nixops set-args --argstr domain yourname.disciplina.site -d disciplina
+nixops deploy -d disciplina
 ```
 
 Subsequent deploys should only run the last command. When you are done with
 your cluster and want to free up resources, run:
 
+```sh
+nixops destroy -d disciplina
 ```
-nixops destroy -d cluster -s state/cluster.nixops
+
+If you want to deploy production cluster, run:
+
+```sh
+nix-shell --argstr accessKeyId production --run 'nixops deploy -d cluster -s state/cluster.nixops'
 ```
