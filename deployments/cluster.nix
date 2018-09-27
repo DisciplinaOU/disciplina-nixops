@@ -13,7 +13,7 @@
       securityGroups = [ resources.ec2SecurityGroups.cluster-ssh.name ];
     };
 
-    imports = [ ../../modules ];
+    imports = [ ../modules ];
 
     nixpkgs.overlays = [(final: previous: {
       # TODO: <disciplina>
