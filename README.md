@@ -93,4 +93,14 @@ nix-shell --argstr accessKeyId production --run 'nixops deploy -d deployer -s st
 
 ## Cluster
 
-Actual Disciplina cluster. Work in progress.
+Actual Disciplina cluster. WIP.
+
+### Provisioning
+
+Inside `nix-shell`:
+
+```sh
+nixops create deployments/cluster.nix -d cluster -s state/cluster.nixops
+nixops set-args --argstr domain your-name.disciplina.site -d cluster -s state/cluster.nixops
+nixops deploy -d cluster -s state/cluster.nixops
+```
