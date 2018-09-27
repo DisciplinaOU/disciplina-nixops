@@ -13,13 +13,10 @@ stdenv.mkDerivation {
   nativeBuildInputs = [ git-crypt nixops sqlite ];
 
   AWS_ACCESS_KEY_ID = accessKeyId;
+  AWS_SHARED_CREDENTIALS_FILE = "${toString ./.}/keys/${accessKeyId}/aws-credentials";
 
   NIX_PATH = lib.concatStringsSep ":" [
     "nixpkgs=${toString pkgs.path}"
     "nixpkgs-overlays=${overlay}"
   ];
-
-  shellHook = ''
-    export AWS_SHARED_CREDENTIALS_FILE=$PWD/keys/aws-credentials
-  '';
 }
