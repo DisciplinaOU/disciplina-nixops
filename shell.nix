@@ -1,19 +1,21 @@
-{ pkgs ? import ./pkgs.nix, accessKeyId ? "staging" }: with pkgs;
+{ pkgs ? import ./pkgs.nix, env ? "staging" }:
+
+with import pkgs.path {
+  overlays = [ (import ./pkgs) ];
+};
 
 let
   overlay = runCommand "nixpkgs-overlays" {} ''
     mkdir -p $out && ln -s ${toString ./.}/pkgs $_
   '';
-
-  nixops = callPackage ./pkgs/nixops {};
 in
 
 stdenv.mkDerivation {
   name = "disciplina-nixops";
-  nativeBuildInputs = [ git-crypt nixops sqlite ];
+  nativeBuildInputs = [ aws-rotate-key git-crypt nixops sqlite ];
 
-  AWS_ACCESS_KEY_ID = accessKeyId;
-  AWS_SHARED_CREDENTIALS_FILE = "${toString ./.}/keys/${accessKeyId}/aws-credentials";
+  AWS_ACCESS_KEY_ID = "default";
+  AWS_SHARED_CREDENTIALS_FILE = "${toString ./.}/keys/${env}/aws-credentials";
 
   NIX_PATH = lib.concatStringsSep ":" [
     "nixpkgs=${toString pkgs.path}"

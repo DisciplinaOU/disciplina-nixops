@@ -88,7 +88,7 @@ Flatpak bundles, LaTeX documents and HTML documentation as part of CI pipeline.
 ### Provisioning
 
 ```sh
-nix-shell --argstr accessKeyId production --run 'nixops deploy -d deployer -s state/deployer.nixops'
+nix-shell --argstr env production --run 'nixops deploy -d deployer -s state/deployer.nixops'
 ```
 
 ## Cluster
@@ -115,5 +115,5 @@ nixops destroy -d disciplina
 If you want to deploy production cluster, run:
 
 ```sh
-nix-shell --argstr accessKeyId production --run 'nixops deploy -d cluster -s state/cluster.nixops'
+nix-shell --argstr env production --run 'nixops deploy -d cluster -s state/cluster.nixops'
 ```
