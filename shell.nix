@@ -18,7 +18,7 @@ stdenv.mkDerivation {
   AWS_SHARED_CREDENTIALS_FILE = "${toString ./.}/keys/${env}/aws-credentials";
 
   NIX_PATH = lib.concatStringsSep ":" [
-    "nixpkgs=${toString pkgs.path}"
+    "nixpkgs=${pkgs.path}"
     "nixpkgs-overlays=${overlay}"
   ];
 }
