@@ -6,7 +6,7 @@ let
   evalMachineInfo = import "${nixops}/share/nix/nixops/eval-machine-info.nix";
 
   evalNixOps = deployment: evalMachineInfo {
-    deploymentName = "pseudo";
+    deploymentName = "eval";
 
     nixpkgs = path;
     system = system;
