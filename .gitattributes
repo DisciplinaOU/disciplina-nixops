@@ -1,4 +1,4 @@
 keys/production/* filter=git-crypt-production diff=git-crypt-production
 keys/staging/* filter=git-crypt diff=git-crypt
-state2/* filter=git-crypt-production diff=git-crypt-production
-state2/*.nixops filter=git-crypt-production diff=sqlite3
+state/* filter=git-crypt-production diff=git-crypt-production
+state/*.nixops filter=git-crypt-production diff=sqlite3
