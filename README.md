@@ -21,9 +21,9 @@ compared to NixOS.
 
 1. Sign up for [MacStadium][] and rent a server.
 
-2. Copy `keys/buildkite-token` to the newly provisioned server:
+2. Copy `keys/production/buildkite-token` to the newly provisioned server:
 ```sh
-scp keys/buildkite-token administrator@1.2.3.4:~
+scp keys/production/buildkite-token administrator@1.2.3.4:~
 ```
 
 3. SSH to the server (default password is in the MacStadium ticket):
