@@ -15,6 +15,7 @@ in
   deployment.ec2.elasticIPv4 = lib.mkIf isInternal (lib.mkForce "");
 
   deployment.keys."witness.yaml".keyFile = ../../keys/staging/witness.yaml;
+  deployment.keys."witness-keyfile-pass".keyFile = ../../keys/staging/witness-keyfile-pass;
 
   networking.firewall.allowedTCPPorts = [ 4040 4041 4030 ];
 
@@ -30,6 +31,10 @@ in
       config-key = "alpha";
 
       comm-n = toString (n + 1);
+
+      witness-keyfile = "/var/lib/disciplina-witness/witness.key";
+      witness-gen-key = true;
+      witness-keyfile-pass = "$(cat /tmp/witness-keyfile-pass)";
 
       peer = map (node: address node.config.networking.privateIPv4)
         (attrValues (filterAttrs (name2: node: name != name2 && isWitness node) nodes));

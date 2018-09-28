@@ -36,23 +36,31 @@ in
 
   config = mkIf cfg.enable {
 
-    systemd.services.disciplina-witness = {
+    systemd.services.disciplina-witness = let
+      cfgfile = "${stateDir}/config.yaml";
+      stateDir = "/var/lib/disciplina-witness";
+    in
+      {
       after = [ "network.target" ];
       requires = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
 
       preStart = ''
-        cat ${lib.concatStringsSep " " cfg.configFiles} |
-          ${pkgs.yq}/bin/yq -n 'reduce [inputs][] as $item ({}; . * $item)' > /tmp/config.yaml
+        ${pkgs.yq}/bin/yq -s '.[0] * .[1]' ${lib.concatStringsSep " " cfg.configFiles} >| ${cfgfile}
+        chmod 444 ${cfgfile}
 
-        chmod 444 /tmp/config.yaml
+        cp /run/keys/witness-keyfile-pass /tmp/witness-keyfile-pass
+        chmod 444 /tmp/witness-keyfile-pass
       '';
 
+      environment.HOME = stateDir;
+
       serviceConfig = {
-        ExecStart = "${pkgs.disciplina}/bin/dscp-witness --config /tmp/config.yaml ${attrsToFlags cfg.args}";
+        ExecStart = "${pkgs.disciplina}/bin/dscp-witness --config ${cfgfile} ${attrsToFlags cfg.args}";
         PermissionsStartOnly = "true";
         DynamicUser = "true";
         StateDirectory = "disciplina-witness";
+        WorkingDirectory = stateDir;
       };
     };
   };
