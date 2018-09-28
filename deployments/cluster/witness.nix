@@ -14,6 +14,8 @@ in
 
   deployment.ec2.elasticIPv4 = lib.mkIf isInternal (lib.mkForce "");
 
+  networking.firewall.allowedTCPPorts = [ 4040 4041 4030 ];
+
   services.disciplina-witness = {
     enable = true;
 
@@ -33,8 +35,6 @@ in
       witness-listen = "0.0.0.0:4030";
     };
   };
-
-  networking.firewall.allowedTCPPorts = [ 4040 4041 4030 ];
 
   system.nixos.tags = [ "witness" ];
 }
