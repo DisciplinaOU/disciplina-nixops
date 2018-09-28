@@ -1,6 +1,6 @@
 # TODO: add AWS ALB to NixOps and use that instead
 
-domain: { deployment, pkgs, ... }:
+domain: { config, pkgs, ... }:
 
 {
   deployment.route53.hostName = "witness.${domain}";
@@ -30,7 +30,7 @@ domain: { deployment, pkgs, ... }:
       '';
     };
 
-    virtualHosts."${deployment.route53.hostName}" = {
+    virtualHosts."${config.deployment.route53.hostName}" = {
       enableACME = true;
 
       # TODO:
