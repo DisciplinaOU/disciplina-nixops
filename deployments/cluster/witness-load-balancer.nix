@@ -49,7 +49,7 @@ in
       "${uris.witness}".locations."/".proxyPass = "http://witness";
       "${uris.educator}".locations."/".proxyPass = "http://educator:8090";
       "${uris.faucet}".locations."/".root = pkgs.disciplina-faucet-frontend.override { faucetUrl = "//${uris.faucet}"; };
-      "${uris.explorer}".locations."/".root = pkgs.disciplina-explorer-frontend.override { explorerUrl = "//${uris.explorer}"; };
+      "${uris.explorer}".locations."/".root = pkgs.disciplina-explorer-frontend.override { witnessUrl = "//${uris.witness}"; };
     };
   };
 }
