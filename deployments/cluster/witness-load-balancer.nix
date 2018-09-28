@@ -33,10 +33,9 @@ in
 
     upstreams.witness = {
       servers = {
-        "witness-1:4030" = {};
-        "witness-2:4030" = {};
-        "witness-3:4030" = {};
-        "witness-4:4030" = {};
+        "witness1:4030" = {};
+        "witness2:4030" = {};
+        "witness3:4030" = {};
       };
 
       extraConfig = ''
