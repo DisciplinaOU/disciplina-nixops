@@ -6,7 +6,7 @@ let
   attrsToFlags = set:
     let
       render = name: value:
-        "--" + name + (optionalString (isString value) " " + value);
+        "--" + name + (optionalString (isString value) (" " + value));
 
       renderList = name: value:
         if isList value
