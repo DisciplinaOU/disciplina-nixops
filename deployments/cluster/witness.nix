@@ -14,6 +14,8 @@ in
 
   deployment.ec2.elasticIPv4 = lib.mkIf isInternal (lib.mkForce "");
 
+  deployment.keys."witness.yaml".keyFile = ../../keys/staging/witness.yaml;
+
   networking.firewall.allowedTCPPorts = [ 4040 4041 4030 ];
 
   services.disciplina-witness = {
@@ -23,11 +25,10 @@ in
       bind = address publicIPv4;
       bind-internal = address "0.0.0.0";
 
-      config = pkgs.disciplina-config;
+      config = [ (toString pkgs.disciplina-config) "/tmp/witness.yaml" ];
       config-key = "alpha";
 
-      comm-n = (n + 1);
-      comm-sec = "dscp-alpha-00000000"; # TODO: read from file
+      comm-n = toString (n + 1);
 
       peer = map (node: address node.config.networking.privateIPv4)
         (attrValues (filterAttrs (name2: node: name != name2 && isWitness node) nodes));

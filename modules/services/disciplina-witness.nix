@@ -24,28 +24,25 @@ in
       type = types.attrs;
       default = {};
     };
-
-    home = mkOption {
-      type = types.path;
-      default = /var/lib/disciplina-witness;
-    };
   };
 
   config = mkIf cfg.enable {
-    users.users.disciplina-witness = {
-      createHome = true;
-      home = toString cfg.home;
-      isSystemUser = true;
-    };
 
     systemd.services.disciplina-witness = {
       after = [ "network.target" ];
       requires = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
 
+      preStart = ''
+        cp /run/keys/witness.yaml /tmp/witness.yaml
+        chmod 444 /tmp/witness.yaml
+      '';
+
       serviceConfig = {
         ExecStart = "${pkgs.disciplina}/bin/dscp-witness ${attrsToFlags cfg.args}";
-        User = "disciplina-witness";
+        PermissionsStartOnly = "true";
+        DynamicUser = "true";
+        StateDirectory = "disciplina-witness";
       };
     };
   };
