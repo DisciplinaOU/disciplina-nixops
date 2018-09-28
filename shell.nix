@@ -20,5 +20,6 @@ stdenv.mkDerivation {
   NIX_PATH = lib.concatStringsSep ":" [
     "nixpkgs=${pkgs.path}"
     "nixpkgs-overlays=${overlay}"
+    "disciplina=https://github.com/DisciplinaOU/disciplina/archive/master.tar.gz"
   ];
 }
