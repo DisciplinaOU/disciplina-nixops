@@ -16,10 +16,9 @@
     imports = [ ../modules ];
 
     nixpkgs.overlays = [(final: previous: {
-      # TODO: <disciplina>
-      inherit (import ../../disciplina/release.nix)
+      inherit (import <disciplina/release.nix> { })
         disciplina-config
-        disciplina-static;
+        disciplina;
     })];
 
     services.nginx = {

@@ -44,7 +44,7 @@ in
       wantedBy = [ "multi-user.target" ];
 
       serviceConfig = {
-        ExecStart = "${pkgs.disciplina-static}/bin/dscp-witness ${attrsToFlags cfg.args}";
+        ExecStart = "${pkgs.disciplina}/bin/dscp-witness ${attrsToFlags cfg.args}";
         User = "disciplina-witness";
       };
     };
