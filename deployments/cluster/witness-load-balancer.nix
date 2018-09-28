@@ -1,9 +1,9 @@
 # TODO: add AWS ALB to NixOps and use that instead
 
-zone: { deployment, pkgs, ... }:
+domain: { deployment, pkgs, ... }:
 
 {
-  deployment.route53.hostName = "witness.${zone}";
+  deployment.route53.hostName = "witness.${domain}";
 
   services.nginx = {
     enable = true;

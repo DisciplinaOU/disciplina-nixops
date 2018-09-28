@@ -36,7 +36,7 @@
   witness-3 = import ./cluster/witness.nix 3;
   witness-4 = import ./cluster/witness.nix 4;
 
-  witness-load-balancer = import ./cluster/witness-load-balancer.nix zone;
+  witness-load-balancer = import ./cluster/witness-load-balancer.nix domain;
 
   resources.ec2KeyPairs.cluster-key = { inherit region; };
 
