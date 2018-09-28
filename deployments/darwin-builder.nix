@@ -47,9 +47,7 @@ in
 
   # TODO: move to nix-darwin module
   system.activationScripts.postActiation.text = ''
-    # TODO: ~/.cache/nix shouldn't have to be explicitly created, this is a
-    # regression from attempted global fetchGit lock.
-    mkdir -p ${config.users.users.buildkite-agent.home}/.cache/nix
+    mkdir -p ${config.users.users.buildkite-agent.home}
     chown -R buildkite-agent:buildkite-agent ${config.users.users.buildkite-agent.home}
     chmod 770 ${config.users.users.buildkite-agent.home}
   '';

@@ -1,3 +1,4 @@
-keys/* filter=git-crypt diff=git-crypt
-state/* filter=git-crypt diff=git-crypt
-state/*.nixops filter=git-crypt diff=sqlite3
+keys/production/* filter=git-crypt-production diff=git-crypt-production
+keys/staging/* filter=git-crypt diff=git-crypt
+state/* filter=git-crypt-production diff=git-crypt-production
+state/*.nixops filter=git-crypt-production diff=sqlite3

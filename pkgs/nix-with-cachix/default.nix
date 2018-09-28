@@ -6,12 +6,13 @@ let
     set -eou pipefail
 
     export PATH=${nix}/bin:$PATH
+    output=$(nix-build "$@")
 
-    for path in $(nix-build "$@"); do
+    for path in "$output"; do
       deriver=$(nix show-derivation $path | ${jq}/bin/jq -r "keys | .[0]")
 
       if [ -n "$CACHIX_NAME" ]; then
-        nix-store -qR --include-outputs $deriver | ${cachix}/bin/cachix push $CACHIX_NAME
+        nix-store -qR --include-outputs $deriver | ${cachix}/bin/cachix push "$CACHIX_NAME"
       fi
     done
   '';

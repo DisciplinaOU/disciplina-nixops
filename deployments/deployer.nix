@@ -1,7 +1,7 @@
-{ region ? "eu-west-1" }:
+{ region ? "eu-west-2" }:
 
 {
-  network.description = "Disciplina cluster deployer";
+  network.description = "Disciplina deployer";
 
   deployer-instance = { config, lib, pkgs, resources, ... }: {
     deployment.targetEnv = "ec2";
@@ -16,10 +16,12 @@
     };
 
     deployment.keys = {
-      aws-credentials.keyFile = ../keys/aws-credentials;
-      buildkite-token.keyFile = ../keys/buildkite-token;
-      committee-secret.keyFile = ../keys/committee-secret;
-      faucet-secret.keyFile = ../keys/faucet-secret;
+      buildkite-token.keyFile = ../keys/production/buildkite-token;
+
+      # Continuous delivery secrets
+      "aws-credentials".keyFile = ../keys/staging/aws-credentials;
+      "faucet-key.json".keyFile = ../keys/staging/faucet-key.json;
+      "witness.yaml".keyFile = ../keys/staging/witness.yaml;
     };
 
     networking.hostName = "disciplina-deployer";

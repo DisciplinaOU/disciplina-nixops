@@ -1,9 +1,8 @@
 Primary Disciplina deployment specification.
 
-To set up this repo, run:
+To set up this repo, enter `nix-shell` and run:
 
 ```sh
-nix-shell
 git crypt unlock
 cat .gitconfig >> .git/config
 ```
@@ -21,9 +20,9 @@ compared to NixOS.
 
 1. Sign up for [MacStadium][] and rent a server.
 
-2. Copy `keys/buildkite-token` to the newly provisioned server:
+2. Copy `keys/production/buildkite-token` to the newly provisioned server:
 ```sh
-scp keys/buildkite-token administrator@1.2.3.4:~
+scp keys/production/buildkite-token administrator@1.2.3.4:~
 ```
 
 3. SSH to the server (default password is in the MacStadium ticket):
@@ -88,9 +87,32 @@ Flatpak bundles, LaTeX documents and HTML documentation as part of CI pipeline.
 ### Provisioning
 
 ```sh
-nix-shell --argstr accessKeyId production --run 'nixops deploy -d deployer -s state/deployer.nixops'
+nix-shell --argstr env production --run 'nixops deploy -d deployer -s state/deployer.nixops'
 ```
 
 ## Cluster
 
-Actual Disciplina cluster. Work in progress.
+Actual Disciplina cluster. WIP.
+
+### Provisioning
+
+If you want to create a personal staging cluster, enter `nix-shell` and run:
+
+```sh
+nixops create deployments/cluster.nix -d disciplina
+nixops set-args --argstr domain yourname.disciplina.site -d disciplina
+nixops deploy -d disciplina
+```
+
+Subsequent deploys should only run the last command. When you are done with
+your cluster and want to free up resources, run:
+
+```sh
+nixops destroy -d disciplina
+```
+
+If you want to deploy production cluster, run:
+
+```sh
+nix-shell --argstr env production --run 'nixops deploy -d cluster -s state/cluster.nixops'
+```

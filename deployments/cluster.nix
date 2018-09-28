@@ -1,4 +1,4 @@
-{ region ? "eu-west-1", zone ? "serokell.review" }:
+{ region ? "eu-west-1", domain ? "see-readme.disciplina.site" }:
 
 {
   network.description = "Disciplina cluster";
