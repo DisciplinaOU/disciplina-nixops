@@ -16,9 +16,12 @@ let
 
     networkExprs = [ deployment ];
   };
+  buildSystems = nixops: recurseIntoAttrs (lib.mapAttrs
+    (name: node: node.config.system.build.toplevel)
+    nixops.nodes);
 in
 
 {
-  disciplina-cluster = evalNixOps ./deployments/cluster.nix;
-  disciplina-deployer = evalNixOps ./deployments/deployer.nix;
+  disciplina-cluster = buildSystems (evalNixOps ./deployments/cluster.nix);
+  disciplina-deployer = buildSystems (evalNixOps ./deployments/deployer.nix);
 }
