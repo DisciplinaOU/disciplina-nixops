@@ -5,12 +5,12 @@ domain: { deployment, pkgs, ... }:
 {
   deployment.route53.hostName = "witness.${domain}";
 
+  boot.kernel.sysctl = {
+    "net.core.somaxconn" = 4096;
+  };
+
   services.nginx = {
     enable = true;
-
-    boot.kernel.sysctl = {
-      "net.core.somaxconn" = 4096;
-    };
 
     appendConfig = ''
       worker_processes auto;
