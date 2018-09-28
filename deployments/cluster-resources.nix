@@ -1,4 +1,4 @@
-{ region, env }:
+{ region, env, domain }:
 
 let mkIP =
   { resources, lib, ... }:
@@ -158,4 +158,22 @@ in rec {
     name = "cluster-kp";
     inherit region;
   };
+
+  route53RecordSets = let
+    lib = (import ../pkgs.nix).lib;
+    lastN = count: list: lib.drop (lib.length list - count) list;
+    domainToZone = d: ((lib.concatStringsSep "." (lastN 2 (lib.splitString "." d))) + ".");
+    mkCname = d: v:
+      { lib, ... }:
+      {
+        domainName = "${d}.${domain}.";
+        recordValues = map (x: "x.${domain}") v;
+        recordType = "CNAME";
+        zoneName = domainToZone domain;
+      };
+  in
+    lib.optionalAttrs (env != "production") {
+      rs-faucet = mkCname "faucet" [ "witness" ];
+      rs-explorer = mkCname "explorer" [ "witness" ];
+    };
 }

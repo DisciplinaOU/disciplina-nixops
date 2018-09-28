@@ -1,12 +1,4 @@
 { region ? "eu-west-2", domain ? "see-readme.disciplina.site", env ? "staging" }:
-let
-  CNAME = domainName: recordValues: {
-    inherit domainName recordValues;
-    DNSZone = lib.findFirst (z: lib.hasSuffix z domainName) dnszones;
-    zoneName = "${DNSZone}.";
-    recordType = "CNAME";
-  };
-in
 {
   network.description = "Disciplina cluster";
 
@@ -15,11 +7,13 @@ in
 
     deployment.ec2 = with resources; {
       inherit region;
-      instanceType = "t2.medium";
+      associatePublicIpAddress = lib.mkDefault true;
+      ebsInitialRootDiskSize = lib.mkDefault 30;
+      elasticIPv4 = if (env == "production") then elasticIPs."${name}-ip" else "";
+      instanceType = lib.mkDefault "t2.medium";
       keyPair = ec2KeyPairs.cluster-key;
       securityGroupIds = [ ec2SecurityGroups.cluster-ssh-public-sg.name ];
       subnetId = lib.mkForce vpcSubnets.cluster-subnet;
-      elasticIPv4 = if (env == "production") then elasticIPs."${name}-ip" else "";
     };
 
     deployment.route53 = lib.optionalAttrs (env != "production") {
@@ -48,7 +42,7 @@ in
     networking.firewall.allowedTCPPorts = [ 22 ];
   };
 
-  resources = import ./cluster-resources.nix { inherit region env; };
+  resources = import ./cluster-resources.nix { inherit region env domain; };
 
   witness-load-balancer = import ./cluster/witness-load-balancer.nix domain;
 
