@@ -24,6 +24,14 @@ in
       type = types.attrs;
       default = {};
     };
+
+    configFiles = mkOption {
+      type = types.listOf types.str;
+      default = [];
+      description = ''
+        List of file paths (as strings) to merge and pass to witness node
+      '';
+    };
   };
 
   config = mkIf cfg.enable {
@@ -34,12 +42,14 @@ in
       wantedBy = [ "multi-user.target" ];
 
       preStart = ''
-        cp /run/keys/witness.yaml /tmp/witness.yaml
-        chmod 444 /tmp/witness.yaml
+        cat ${lib.concatStringsSep " " cfg.configFiles} |
+          ${pkgs.yq}/bin/yq -n 'reduce [inputs][] as $item ({}; . * $item)' > /tmp/config.yaml
+
+        chmod 444 /tmp/config.yaml
       '';
 
       serviceConfig = {
-        ExecStart = "${pkgs.disciplina}/bin/dscp-witness ${attrsToFlags cfg.args}";
+        ExecStart = "${pkgs.disciplina}/bin/dscp-witness --config /tmp/config.yaml ${attrsToFlags cfg.args}";
         PermissionsStartOnly = "true";
         DynamicUser = "true";
         StateDirectory = "disciplina-witness";

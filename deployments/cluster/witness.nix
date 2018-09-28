@@ -21,11 +21,12 @@ in
   services.disciplina-witness = {
     enable = true;
 
+    configFiles = [ (toString pkgs.disciplina-config) "/run/keys/witness.yaml" ];
+
     args = {
       bind = address publicIPv4;
       bind-internal = address "0.0.0.0";
 
-      config = [ (toString pkgs.disciplina-config) "/tmp/witness.yaml" ];
       config-key = "alpha";
 
       comm-n = toString (n + 1);
