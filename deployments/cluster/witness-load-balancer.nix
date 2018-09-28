@@ -44,9 +44,11 @@ in
       '';
     };
 
+    # upstreams.educator.servers = { "educator:8090" = {}; };
+
     virtualHosts= {
       "${uris.witness}".locations."/".proxyPass = "http://witness";
-      "${uris.educator}".locations."/".proxyPass = "http://educator:8090";
+      # "${uris.educator}".locations."/".proxyPass = "http://educator";
       "${uris.faucet}".locations."/".root = pkgs.disciplina-faucet-frontend.override { faucetUrl = "//${uris.faucet}"; };
       "${uris.explorer}".locations."/".root = pkgs.disciplina-explorer-frontend.override { witnessUrl = "//${uris.witness}"; };
     };
