@@ -1,4 +1,4 @@
-{ region ? "eu-west-1", domain ? "see-readme.disciplina.site" }:
+{ region ? "eu-west-2", domain ? "see-readme.disciplina.site" }:
 
 {
   network.description = "Disciplina cluster";
@@ -16,10 +16,9 @@
     imports = [ ../modules ];
 
     nixpkgs.overlays = [(final: previous: {
-      # TODO: <disciplina>
-      inherit (import ../../disciplina/release.nix)
+      inherit (import <disciplina/release.nix> { })
         disciplina-config
-        disciplina-static;
+        disciplina;
     })];
 
     services.nginx = {
@@ -36,7 +35,7 @@
   witness-3 = import ./cluster/witness.nix 3;
   witness-4 = import ./cluster/witness.nix 4;
 
-  witness-load-balancer = import ./cluster/witness-load-balancer.nix zone;
+  witness-load-balancer = import ./cluster/witness-load-balancer.nix domain;
 
   resources.ec2KeyPairs.cluster-key = { inherit region; };
 

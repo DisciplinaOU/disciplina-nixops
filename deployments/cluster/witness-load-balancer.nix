@@ -1,16 +1,16 @@
 # TODO: add AWS ALB to NixOps and use that instead
 
-zone: { deployment, pkgs, ... }:
+domain: { config, pkgs, ... }:
 
 {
-  deployment.route53.hostName = "witness.${zone}";
+  deployment.route53.hostName = "witness.${domain}";
+
+  boot.kernel.sysctl = {
+    "net.core.somaxconn" = 4096;
+  };
 
   services.nginx = {
     enable = true;
-
-    boot.kernel.sysctl = {
-      "net.core.somaxconn" = 4096;
-    };
 
     appendConfig = ''
       worker_processes auto;
@@ -30,7 +30,7 @@ zone: { deployment, pkgs, ... }:
       '';
     };
 
-    virtualHosts."${deployment.route53.hostName}" = {
+    virtualHosts."${config.deployment.route53.hostName}" = {
       enableACME = true;
 
       # TODO:

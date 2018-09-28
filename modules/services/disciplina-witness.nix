@@ -6,7 +6,7 @@ let
   attrsToFlags = set:
     let
       render = name: value:
-        "--" + name + (optionalString (isString value) " " + value);
+        "--" + name + (optionalString (isString value) (" " + value));
 
       renderList = name: value:
         if isList value
@@ -44,7 +44,7 @@ in
       wantedBy = [ "multi-user.target" ];
 
       serviceConfig = {
-        ExecStart = "${pkgs.disciplina-static}/bin/dscp-witness ${attrsToFlags cfg.args}";
+        ExecStart = "${pkgs.disciplina}/bin/dscp-witness ${attrsToFlags cfg.args}";
         User = "disciplina-witness";
       };
     };
