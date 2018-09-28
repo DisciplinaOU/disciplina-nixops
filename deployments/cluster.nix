@@ -1,4 +1,4 @@
-{ region ? "eu-west-1", domain ? "see-readme.disciplina.site" }:
+{ region ? "eu-west-2", domain ? "see-readme.disciplina.site" }:
 
 {
   network.description = "Disciplina cluster";
