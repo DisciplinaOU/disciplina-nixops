@@ -112,17 +112,6 @@ in rec {
       ];
     };
 
-  ec2SecurityGroups.cluster-telegraf-private-sg =
-    { resources, lib, ... }:
-    {
-      inherit region;
-      vpcId = resources.vpc.cluster-vpc;
-      rules = [
-        # Telegraf ingress port
-        { fromPort =  8125; toPort =  8125; protocol = "udp"; sourceIp = vpc.cluster-vpc.cidrBlock; }
-      ];
-    };
-
   vpcRouteTables.cluster-route-table =
     { resources, ... }:
     {
