@@ -44,16 +44,19 @@ in
       stateDir = "/var/lib/disciplina-witness";
     in
       {
-      after = [ "network.target" ];
-      requires = [ "network.target" ];
+      after = [ "network.target" ] ++ (map (x: "${x}-key.service") cfg.keyFiles);
+      requires = [ "network.target" ] ++ (map (x: "${x}-key.service") cfg.keyFiles);
       wantedBy = [ "multi-user.target" ];
 
       preStart = concatMapStringsSep "\n" (x: "cp /run/keys/${x} /tmp/${x}; chmod 444 /tmp/${x}") cfg.keyFiles;
 
       environment.HOME = stateDir;
 
+      script = ''
+        ${pkgs.disciplina}/bin/dscp-witness ${attrsToFlags cfg.args}
+      '';
+
       serviceConfig = {
-        ExecStart = "${pkgs.disciplina}/bin/dscp-witness ${attrsToFlags cfg.args}";
         PermissionsStartOnly = "true";
         DynamicUser = "true";
         StateDirectory = "disciplina-witness";
