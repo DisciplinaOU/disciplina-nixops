@@ -24,7 +24,7 @@ in
   # * Add its name to services.disciplina-witness.keyFiles
   # * Wrap its value in `services.disciplina-witness.args` with `cat`
   deployment.keys = {
-    "witness-keyfile-pass".keyFile = ../../keys/staging/witness-keyfile-pass;
+    "witness-keyfile-pass".keyFile = ../../keys/staging/witness/keyfile-pass;
     "witness-comm-sec".keyFile = ../../keys/staging/witness/comm-sec;
   };
 
