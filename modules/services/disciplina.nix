@@ -49,13 +49,13 @@ in
 
   config = mkIf cfg.enable {
 
-    systemd.services.disciplina-witness = let
+    systemd.services."disciplina-${cfg.type}" = let
       cfgfile = "${stateDir}/config.yaml";
       stateDir = "/var/lib/disciplina-${cfg.type}";
     in
       {
-      after = [ "network.target" ] ++ (map (x: "${x}-key.service") cfg.keyFiles);
-      requires = [ "network.target" ] ++ (map (x: "${x}-key.service") cfg.keyFiles);
+      after = [ "network.target" ] ++ (optionals (cfg.keyFiles != []) (map (x: "${x}-key.service") cfg.keyFiles));
+      requires = [ "network.target" ] ++ (optionals (cfg.keyFiles != []) (map (x: "${x}-key.service") cfg.keyFiles));
       wantedBy = [ "multi-user.target" ];
 
       preStart = concatMapStringsSep "\n" (x: "cp /run/keys/${x} /tmp/${x}; chmod 444 /tmp/${x}") cfg.keyFiles;
