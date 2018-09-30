@@ -24,7 +24,6 @@ in
   # * Add its name to services.disciplina-witness.keyFiles
   # * Wrap its value in `services.disciplina-witness.args` with `cat`
   deployment.keys = {
-    "witness-keyfile-pass".keyFile = ../../keys/staging/witness/keyfile-pass;
     "witness-comm-sec".keyFile = ../../keys/staging/witness/comm-sec;
   };
 
@@ -42,7 +41,6 @@ in
     # For use with `cat` helper function to wrap secrets
     # Also adds dependency on nixops keyfile services
     keyFiles = [
-      "witness-keyfile-pass"
       "witness-comm-sec"
     ];
 
@@ -59,10 +57,6 @@ in
       comm-sec = cat "witness-comm-sec";
 
       config = toString pkgs.disciplina-config;
-
-      witness-keyfile = "/tmp/witness.key";
-      witness-gen-key = true;
-      witness-keyfile-pass = cat "witness-keyfile-pass";
 
       peer = map (node: address node.config.networking.privateIPv4)
         (attrValues (filterAttrs (name2: node: name != name2 && isWitness node) nodes));

@@ -49,7 +49,10 @@ in
 
   config = mkIf cfg.enable {
 
-    users.users.disciplina = {};
+    users.users.disciplina = {
+      home = "/var/lib/disciplina-${cfg.type}";
+      createHome = true;
+    };
 
     systemd.services."disciplina-${cfg.type}" = let
       cfgfile = "${stateDir}/config.yaml";
@@ -63,11 +66,7 @@ in
       preStart = (concatMapStringsSep "\n" (x: "cp /run/keys/${x} /tmp/${x}; chown disciplina /tmp/${x}; chmod 400 /tmp/${x}") cfg.keyFiles) + ''
 
         # Empty line before this one is necessary because concatMapStringsSep doesn't end with a newline
-        mkdir -p ${stateDir}
-        chown -R disciplina ${stateDir}
       '';
-
-      environment.HOME = stateDir;
 
       script = ''
         ${pkgs.disciplina}/bin/dscp-${cfg.type} ${attrsToFlags cfg.args}
@@ -75,8 +74,8 @@ in
 
       serviceConfig = {
         PermissionsStartOnly = "true";
-        # DynamicUser = "true";
         User = "disciplina";
+        # DynamicUser = "true";
         # StateDirectory = "disciplina-${cfg.type}";
         WorkingDirectory = stateDir;
       };
