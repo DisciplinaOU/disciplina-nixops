@@ -49,6 +49,8 @@ in
 
   config = mkIf cfg.enable {
 
+    users.users.disciplina = {};
+
     systemd.services."disciplina-${cfg.type}" = let
       cfgfile = "${stateDir}/config.yaml";
       stateDir = "/var/lib/disciplina-${cfg.type}";
@@ -58,7 +60,12 @@ in
       requires = [ "network.target" ] ++ (optionals (cfg.keyFiles != []) (map (x: "${x}-key.service") cfg.keyFiles));
       wantedBy = [ "multi-user.target" ];
 
-      preStart = concatMapStringsSep "\n" (x: "cp /run/keys/${x} /tmp/${x}; chmod 444 /tmp/${x}") cfg.keyFiles;
+      preStart = (concatMapStringsSep "\n" (x: "cp /run/keys/${x} /tmp/${x}; chown disciplina /tmp/${x}; chmod 400 /tmp/${x}") cfg.keyFiles) + ''
+
+        # Empty line before this one is necessary because concatMapStringsSep doesn't end with a newline
+        mkdir -p ${stateDir}
+        chown -R disciplina ${stateDir}
+      '';
 
       environment.HOME = stateDir;
 
@@ -68,8 +75,9 @@ in
 
       serviceConfig = {
         PermissionsStartOnly = "true";
-        DynamicUser = "true";
-        StateDirectory = "disciplina-${cfg.type}";
+        # DynamicUser = "true";
+        User = "disciplina";
+        # StateDirectory = "disciplina-${cfg.type}";
         WorkingDirectory = stateDir;
       };
     };
