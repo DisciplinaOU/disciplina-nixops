@@ -23,13 +23,16 @@ in
     args = mkOption {
       type = types.attrs;
       default = {};
+      description = ''
+        Set of arguments passed to witness CLI
+      '';
     };
 
-    configFiles = mkOption {
+    keyFiles = mkOption {
       type = types.listOf types.str;
       default = [];
       description = ''
-        List of file paths (as strings) to merge and pass to witness node
+        list of files from /run/keys to copy to /tmp
       '';
     };
   };
@@ -45,18 +48,12 @@ in
       requires = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
 
-      preStart = ''
-        ${pkgs.yq}/bin/yq -s '.[0] * .[1]' ${lib.concatStringsSep " " cfg.configFiles} >| ${cfgfile}
-        chmod 444 ${cfgfile}
-
-        cp /run/keys/witness-keyfile-pass /tmp/witness-keyfile-pass
-        chmod 444 /tmp/witness-keyfile-pass
-      '';
+      preStart = concatMapStringsSep "\n" (x: "cp /run/keys/${x} /tmp/${x}; chmod 444 /tmp/${x}") cfg.keyFiles;
 
       environment.HOME = stateDir;
 
       serviceConfig = {
-        ExecStart = "${pkgs.disciplina}/bin/dscp-witness --config ${cfgfile} ${attrsToFlags cfg.args}";
+        ExecStart = "${pkgs.disciplina}/bin/dscp-witness ${attrsToFlags cfg.args}";
         PermissionsStartOnly = "true";
         DynamicUser = "true";
         StateDirectory = "disciplina-witness";
