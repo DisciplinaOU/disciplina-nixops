@@ -18,6 +18,8 @@ in
     [ "http-public" ]
   );
 
+  deployment.keys."faucet-key.json".keyFile = ../../keys/staging/faucet-key.json;
+
   boot.kernel.sysctl = {
     "net.core.somaxconn" = 4096;
   };
@@ -74,12 +76,12 @@ in
   services.disciplina = {
     enable = true;
     type = "faucet";
+    keyFiles = [ "faucet-key.json" ];
     args = {
       config = toString pkgs.disciplina-config;
       config-key = "alpha";
 
-      faucet-keyfile = "/tmp/faucet.key";
-      faucet-gen-key = true;
+      faucet-keyfile = "/tmp/faucet-key.json";
 
       faucet-listen = "127.0.0.1:4014";
       translated-amount = "20";
