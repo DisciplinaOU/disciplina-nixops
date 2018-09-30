@@ -54,7 +54,7 @@ in
 
     # upstreams.educator.servers = { "educator:8090" = {}; };
     upstreams.faucet = {
-      servers."localhost:4014" = {};
+      servers."127.0.0.1:4014" = {};
       extraConfig = "keepalive 32;";
     };
 
