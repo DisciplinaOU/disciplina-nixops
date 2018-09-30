@@ -30,6 +30,12 @@ in
     appendConfig = ''
       worker_processes auto;
     '';
+    eventsConfig = ''
+      worker_connections 16384;
+    '';
+    commonHttpConfig = ''
+      access_log syslog:server=unix:/dev/log,tag=nginx,severity=info combined;
+    '';
 
     upstreams.witness = {
       servers = {
