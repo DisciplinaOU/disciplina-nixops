@@ -51,6 +51,8 @@ in
       bind = address publicIPv4;
       bind-internal = address "0.0.0.0";
 
+      db-path = "${stateDir}/witness.db";
+
       config-key = "alpha";
 
       comm-n = toString n;
