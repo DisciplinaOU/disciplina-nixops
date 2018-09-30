@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 declare -a NIXOPS_OPTIONS DEPLOY_FIRST
-NIXOPS_OPTIONS=( '-I ssh-key=/var/lib/nixops/.ssh/id_rsa' )
+NIXOPS_OPTIONS=( -d disciplina --show-trace )
 DEPLOY_FIRST=( witness0 witness-load-balancer )
-SLEEP='15m'
+SLEEP='3m'
 
 nixops deploy "${NIXOPS_OPTIONS[@]}" --include "${DEPLOY_FIRST[@]}"
 sleep "$SLEEP"
