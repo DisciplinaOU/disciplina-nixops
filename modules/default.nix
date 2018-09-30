@@ -1,5 +1,5 @@
 {
   imports = [
-    ./services/disciplina-witness.nix
+    ./services/disciplina.nix
   ];
 }

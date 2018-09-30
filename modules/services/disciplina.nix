@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }: with lib;
 
 let
-  cfg = config.services.disciplina-witness;
+  cfg = config.services.disciplina;
 
   attrsToFlags = set:
     let
@@ -17,8 +17,18 @@ let
 in
 
 {
-  options.services.disciplina-witness = {
+  options.services.disciplina = {
     enable = mkEnableOption "Disciplina witness";
+
+    type = mkOption {
+      type = types.enum [ "witness" "faucet" "educator" ];
+      default = "witness";
+      description = ''
+        The type of node to spawn. Sets the systemd unit name to
+        `disciplina-<type>`, state dir to `/var/lib/disciplina-<type>`, and
+        runs `dscp-<type>`.
+      '';
+    };
 
     args = mkOption {
       type = types.attrs;
@@ -41,7 +51,7 @@ in
 
     systemd.services.disciplina-witness = let
       cfgfile = "${stateDir}/config.yaml";
-      stateDir = "/var/lib/disciplina-witness";
+      stateDir = "/var/lib/disciplina-${cfg.type}";
     in
       {
       after = [ "network.target" ] ++ (map (x: "${x}-key.service") cfg.keyFiles);
@@ -53,13 +63,13 @@ in
       environment.HOME = stateDir;
 
       script = ''
-        ${pkgs.disciplina}/bin/dscp-witness ${attrsToFlags cfg.args}
+        ${pkgs.disciplina}/bin/dscp-${cfg.type} ${attrsToFlags cfg.args}
       '';
 
       serviceConfig = {
         PermissionsStartOnly = "true";
         DynamicUser = "true";
-        StateDirectory = "disciplina-witness";
+        StateDirectory = "disciplina-${cfg.type}";
         WorkingDirectory = stateDir;
       };
     };

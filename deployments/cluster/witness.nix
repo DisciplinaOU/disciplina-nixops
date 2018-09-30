@@ -33,8 +33,9 @@ in
     4030        # Witness HTTP Wallet API
   ];
 
-  services.disciplina-witness = {
+  services.disciplina = {
     enable = true;
+    type = "witness";
 
     ##
     # These are copied to /tmp/${name}
