@@ -51,12 +51,39 @@ in
     };
 
     # upstreams.educator.servers = { "educator:8090" = {}; };
+    upstreams.faucet = {
+      servers."localhost:4014" = {};
+      extraConfig = "keepalive 32;";
+    };
 
     virtualHosts= {
       "${uris.witness}".locations."/".proxyPass = "http://witness";
-      # "${uris.educator}".locations."/".proxyPass = "http://educator";
-      "${uris.faucet}".locations."/".root = pkgs.disciplina-faucet-frontend.override { faucetUrl = "//${uris.faucet}"; };
       "${uris.explorer}".locations."/".root = pkgs.disciplina-explorer-frontend.override { witnessUrl = "//${uris.witness}"; };
+      # "${uris.educator}".locations."/".proxyPass = "http://educator";
+
+      "${uris.faucet}" = {
+        locations = {
+          "= /api/faucet/v1/".index = "index.html";
+          "/api".proxyPass = "http://faucet";
+          "/".root = pkgs.disciplina-faucet-frontend.override { faucetUrl = "//${uris.faucet}"; };
+        };
+      };
+    };
+  };
+
+  services.disciplina = {
+    enable = true;
+    type = "faucet";
+    args = {
+      config = toString pkgs.disciplina-config;
+      config-key = "alpha";
+
+      faucet-keyfile = "/tmp/faucet.key";
+      faucet-gen-key = true;
+
+      faucet-listen = "127.0.0.1:4014";
+      translated-amount = "20";
+      witness-backend = "http://witness1:4030";
     };
   };
 }
