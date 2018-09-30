@@ -3,8 +3,9 @@
   network.description = "Disciplina cluster";
 
   defaults = { resources, lib, name, ... }: {
-    deployment.targetEnv = "ec2";
+    imports = [ ../modules ];
 
+    deployment.targetEnv = "ec2";
     deployment.ec2 = with resources; {
       inherit region;
       associatePublicIpAddress = lib.mkDefault true;
@@ -20,8 +21,6 @@
       usePublicDNSName = true;
       hostname = "${name}.${domain}";
     };
-
-    imports = [ ../modules ];
 
     nixpkgs.overlays = [(final: previous: let inherit (final) callPackage; in {
       inherit (import <disciplina/release.nix> { })
