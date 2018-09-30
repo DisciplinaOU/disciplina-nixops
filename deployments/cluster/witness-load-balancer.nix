@@ -52,7 +52,11 @@ in
       '';
     };
 
-    # upstreams.educator.servers = { "educator:8090" = {}; };
+    upstreams.educator = {
+      servers."educator:4040" = {};
+      extraConfig = "keepalive 32;";
+    };
+
     upstreams.faucet = {
       servers."127.0.0.1:4014" = {};
       extraConfig = "keepalive 32;";
@@ -60,8 +64,8 @@ in
 
     virtualHosts= {
       "${uris.witness}".locations."/".proxyPass = "http://witness";
+      "${uris.educator}".locations."/".proxyPass = "http://educator";
       "${uris.explorer}".locations."/".root = pkgs.disciplina-explorer-frontend.override { witnessUrl = "//${uris.witness}"; };
-      # "${uris.educator}".locations."/".proxyPass = "http://educator";
 
       "${uris.faucet}" = {
         locations = {

@@ -112,6 +112,17 @@ in rec {
       ];
     };
 
+  ec2SecurityGroups.cluster-educator-api-private-sg =
+    { resources, lib, ... }:
+    {
+      inherit region;
+      vpcId = resources.vpc.cluster-vpc;
+      rules = [
+        # Disciplina witness HTTP API
+        { fromPort =  4040; toPort =  4040; sourceIp = vpc.cluster-vpc.cidrBlock; }
+      ];
+    };
+
   vpcRouteTables.cluster-route-table =
     { resources, ... }:
     {

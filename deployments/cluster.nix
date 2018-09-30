@@ -49,4 +49,6 @@
   witness1 = import ./cluster/witness.nix 1;
   witness2 = import ./cluster/witness.nix 2;
   witness3 = import ./cluster/witness.nix 3;
+
+  educator = import ./cluster/educator.nix 4;
 }
