@@ -60,7 +60,7 @@ in
 
       config = toString pkgs.disciplina-config;
 
-      witness-keyfile = "${stateDir}/witness.key";
+      witness-keyfile = "/tmp/witness.key";
       witness-gen-key = true;
       witness-keyfile-pass = cat "witness-keyfile-pass";
 
