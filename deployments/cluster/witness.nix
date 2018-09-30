@@ -53,7 +53,7 @@ in
 
       config-key = "alpha";
 
-      comm-n = toString (n + 1);
+      comm-n = toString n;
       comm-sec = cat "witness-comm-sec";
 
       config = toString pkgs.disciplina-config;
