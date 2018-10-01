@@ -1,6 +1,6 @@
 # TODO: add AWS ALB to NixOps and use that instead
 
-domain: { config, lib, pkgs, resources, ... }:
+env: domain: { config, lib, pkgs, resources, ... }:
 
 let
   uris = {
@@ -18,7 +18,7 @@ in
     [ "http-public" ]
   );
 
-  deployment.keys."faucet-key.json".keyFile = ../../keys/staging/faucet-key.json;
+  deployment.keys."faucet-key.json".keyFile = ../../keys + "/${env}/faucet-key.json";
 
   boot.kernel.sysctl = {
     "net.core.somaxconn" = 4096;

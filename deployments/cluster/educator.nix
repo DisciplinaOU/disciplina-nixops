@@ -4,19 +4,20 @@ let
   address = ip: ip + ":4010:4011";
   inherit (nodes.witness-load-balancer.config.networking) publicIPv4;
   isWitness = node: elem "witness" node.config.system.nixos.tags;
-  isInternal = n == 0;
 in
 
 {
   ##
   # `map` to make additional SGs easier to add and SG list more readable
   deployment.ec2.securityGroupIds = map (x: resources.ec2SecurityGroups."cluster-${x}-sg".name ) (
-    [ "witness-api-private" ] ++
-      (if isInternal then [ "witness-private" ] else [ "witness-public" ])
+    [ "educator-api-private" "witness-api-private" ]
   );
 
-  ## We do not allocate an elastic IP for the internal witness node, so don't try to associate it
-  deployment.ec2.elasticIPv4 = lib.mkIf isInternal (lib.mkForce "");
+  networking.firewall.allowedTCPPorts = [
+    4040 4041   # Witness ZMQ API
+    4030        # Witness HTTP Wallet API
+    4040        # Educator HTTP API
+  ];
 
   ##
   # For each secret data point:
@@ -27,14 +28,9 @@ in
     "witness-comm-sec".keyFile = ../../keys + "/${env}/witness/comm-sec";
   };
 
-  networking.firewall.allowedTCPPorts = [
-    4040 4041   # Witness ZMQ API
-    4030        # Witness HTTP Wallet API
-  ];
-
-  services.disciplina = {
+  services.disciplina = rec {
     enable = true;
-    type = "witness";
+    type = "educator";
 
     ##
     # These are copied to /tmp/${name}
@@ -46,12 +42,18 @@ in
 
     args = let
       cat = name: ''"$(cat "/tmp/${name}" 2>/dev/null)"'';
-      stateDir = "/var/lib/disciplina-witness";
+      stateDir = "/var/lib/disciplina-${type}";
     in {
+      ##
+      # --educator-keyfile $tmp_files/educator.key
+      # --educator-gen-key
+      # --sql-path $tmp_files/educator.db
+      # --educator-listen 127.0.0.1:8090
+      # --educator-bot
+      # --educator-bot-delay 3s
+
       bind = address publicIPv4;
       bind-internal = address "0.0.0.0";
-
-      db-path = "${stateDir}/witness.db";
 
       config-key = "alpha";
 
@@ -64,8 +66,13 @@ in
         (attrValues (filterAttrs (name2: node: name != name2 && isWitness node) nodes));
 
       witness-listen = "0.0.0.0:4030";
+
+      educator-listen = "0.0.0.0:4040";
+      sql-path = "${stateDir}/educator.db";
+      educator-bot = true;
+      educator-bot-delay = "3s";
     };
   };
 
-  system.nixos.tags = [ "witness" ];
+  system.nixos.tags = [ "educator" "witness" ];
 }

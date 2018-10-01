@@ -114,5 +114,12 @@ nixops destroy -d disciplina
 If you want to deploy production cluster, run:
 
 ```sh
+nixops set-args --argstr env production -d disciplina
 nix-shell --argstr env production --run 'nixops deploy -d cluster -s state/cluster.nixops'
+nixops set-args --unset env -d disciplina
 ```
+
+Since `nixops set-args` permanently modifies a deployment, you need to unset it
+again if you want to deploy anywhere other than production. So the above
+snippet sets the environment, deploys, and usets it again (it defaults to
+staging).

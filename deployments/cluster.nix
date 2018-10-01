@@ -43,12 +43,12 @@
 
   resources = import ./cluster-resources.nix { inherit region env domain; };
 
-  witness-load-balancer = import ./cluster/witness-load-balancer.nix domain;
+  witness-load-balancer = import ./cluster/witness-load-balancer.nix env domain;
 
-  witness0 = import ./cluster/witness.nix 0;
-  witness1 = import ./cluster/witness.nix 1;
-  witness2 = import ./cluster/witness.nix 2;
-  witness3 = import ./cluster/witness.nix 3;
+  witness0 = import ./cluster/witness.nix env 0;
+  witness1 = import ./cluster/witness.nix env 1;
+  witness2 = import ./cluster/witness.nix env 2;
+  witness3 = import ./cluster/witness.nix env 3;
 
-  educator = import ./cluster/educator.nix 4;
+  educator = import ./cluster/educator.nix env 4;
 }
