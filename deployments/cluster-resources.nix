@@ -29,10 +29,11 @@ in rec {
 
   elasticIPs = if production then
     {
-      builder-ip = mkIP;
+      witness-load-balancer-ip = mkIP;
       witness1-ip = mkIP;
       witness2-ip = mkIP;
       witness3-ip = mkIP;
+      educator-ip = mkIP;
     } else {};
 
   ec2SecurityGroups.cluster-http-public-sg =
