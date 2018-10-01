@@ -7,6 +7,7 @@ let mkIP =
     vpc = true;
   };
   zone = "${region}a";
+  production = env == "production";
 
 in rec {
   vpc.cluster-vpc = {
@@ -26,7 +27,7 @@ in rec {
       mapPublicIpOnLaunch = true;
     };
 
-  elasticIPs = if (env == "production") then
+  elasticIPs = if production then
     {
       builder-ip = mkIP;
       witness1-ip = mkIP;
@@ -172,7 +173,7 @@ in rec {
         zoneName = domainToZone domain;
       };
   in
-    lib.optionalAttrs (env != "production") {
+    lib.optionalAttrs production {
       rs-faucet = mkLBCname "faucet";
       rs-explorer = mkLBCname "explorer";
     };
