@@ -16,6 +16,7 @@ let
 
     networkExprs = [ deployment ];
   };
+  # buildSystems: needed so it doesn't build the vm's etc.
   buildSystems = nixops: recurseIntoAttrs (lib.mapAttrs
     (name: node: node.config.system.build.toplevel)
     nixops.nodes);
