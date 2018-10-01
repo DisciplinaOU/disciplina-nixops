@@ -173,8 +173,9 @@ in rec {
         zoneName = domainToZone domain;
       };
   in
-    lib.optionalAttrs production {
+    lib.optionalAttrs (!production) {
       rs-faucet = mkLBCname "faucet";
       rs-explorer = mkLBCname "explorer";
+      rs-educator = mkLBCname "educator";
     };
 }

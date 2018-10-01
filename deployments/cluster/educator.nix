@@ -66,11 +66,14 @@ in
         (attrValues (filterAttrs (name2: node: name != name2 && isWitness node) nodes));
 
       witness-listen = "0.0.0.0:4030";
-
       educator-listen = "0.0.0.0:4040";
+
       sql-path = "${stateDir}/educator.db";
       educator-bot = true;
       educator-bot-delay = "3s";
+
+      educator-keyfile = "${stateDir}/educator.key";
+      educator-gen-key = true;
     };
   };
 
