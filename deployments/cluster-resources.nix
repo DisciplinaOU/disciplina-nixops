@@ -1,11 +1,16 @@
 { region, env, domain }:
 
-let mkIP =
-  { resources, lib, ... }:
-  {
+let
+  mkIP = { resources, lib, ... }: {
     inherit region;
     vpc = true;
   };
+
+  mkSG = rules: { resources, lib, ... }: {
+    inherit region rules;
+    vpcId = resources.vpc.cluster-vpc;
+  };
+
   zone = "${region}a";
   production = env == "production";
 
@@ -36,94 +41,38 @@ in rec {
       educator-ip = mkIP;
     } else {};
 
-  ec2SecurityGroups.cluster-http-public-sg =
-    { resources, lib, ... }:
-    {
-      inherit region;
-      vpcId = resources.vpc.cluster-vpc;
-      rules = [
-        # HTTP(S)
-        { fromPort =  80; toPort =  80; sourceIp = "0.0.0.0/0"; }
-        { fromPort = 443; toPort = 443; sourceIp = "0.0.0.0/0"; }
-      ];
-    };
+  ec2SecurityGroups.cluster-http-public-sg = mkSG [
+    { fromPort =  80; toPort =  80; sourceIp = "0.0.0.0/0"; }
+    { fromPort = 443; toPort = 443; sourceIp = "0.0.0.0/0"; }
+  ];
 
-  ec2SecurityGroups.cluster-ssh-private-sg =
-    { resources, lib, ... }:
-    {
-      inherit region;
-      vpcId = resources.vpc.cluster-vpc;
-      rules = [
-        # SSH
-        { fromPort =    22; toPort =    22; sourceIp = vpc.cluster-vpc.cidrBlock; }
-      ];
-    };
+  ec2SecurityGroups.cluster-ssh-private-sg = mkSG [
+    { fromPort =    22; toPort =    22; sourceIp = vpc.cluster-vpc.cidrBlock; }
+  ];
 
-  ec2SecurityGroups.cluster-ssh-public-sg =
-    { resources, lib, ... }:
-    {
-      inherit region;
-      vpcId = resources.vpc.cluster-vpc;
-      rules = [
-        # SSH
-        { fromPort =    22; toPort =    22; sourceIp = "0.0.0.0/0"; }
-      ];
-    };
+  ec2SecurityGroups.cluster-ssh-public-sg = mkSG [
+    { fromPort =    22; toPort =    22; sourceIp = "0.0.0.0/0"; }
+  ];
 
-  ec2SecurityGroups.cluster-witness-public-sg =
-    { resources, lib, ... }:
-    {
-      inherit region;
-      vpcId = resources.vpc.cluster-vpc;
-      rules = [
-        # Disciplina witness
-        { fromPort =  4010; toPort =  4011; sourceIp = "0.0.0.0/0"; }
-      ];
-    };
+  ec2SecurityGroups.cluster-witness-public-sg = mkSG [
+    { fromPort =  4010; toPort =  4011; sourceIp = "0.0.0.0/0"; }
+  ];
 
-  ec2SecurityGroups.cluster-witness-private-sg =
-    { resources, lib, ... }:
-    {
-      inherit region;
-      vpcId = resources.vpc.cluster-vpc;
-      rules = [
-        # Disciplina witness ZMQ
-        { fromPort =  4010; toPort =  4011; sourceIp = vpc.cluster-vpc.cidrBlock; }
-      ];
-    };
+  ec2SecurityGroups.cluster-witness-private-sg = mkSG [
+    { fromPort =  4010; toPort =  4011; sourceIp = vpc.cluster-vpc.cidrBlock; }
+  ];
 
-  ec2SecurityGroups.cluster-witness-api-public-sg =
-    { resources, lib, ... }:
-    {
-      inherit region;
-      vpcId = resources.vpc.cluster-vpc;
-      rules = [
-        # Disciplina witness HTTP API
-        { fromPort =  4030; toPort =  4030; sourceIp = "0.0.0.0/0"; }
-      ];
-    };
+  ec2SecurityGroups.cluster-witness-api-public-sg = mkSG [
+    { fromPort =  4030; toPort =  4030; sourceIp = "0.0.0.0/0"; }
+  ];
 
-  ec2SecurityGroups.cluster-witness-api-private-sg =
-    { resources, lib, ... }:
-    {
-      inherit region;
-      vpcId = resources.vpc.cluster-vpc;
-      rules = [
-        # Disciplina witness HTTP API
-        { fromPort =  4030; toPort =  4030; sourceIp = vpc.cluster-vpc.cidrBlock; }
-      ];
-    };
+  ec2SecurityGroups.cluster-witness-api-private-sg = mkSG [
+    { fromPort =  4030; toPort =  4030; sourceIp = vpc.cluster-vpc.cidrBlock; }
+  ];
 
-  ec2SecurityGroups.cluster-educator-api-private-sg =
-    { resources, lib, ... }:
-    {
-      inherit region;
-      vpcId = resources.vpc.cluster-vpc;
-      rules = [
-        # Disciplina witness HTTP API
-        { fromPort =  4040; toPort =  4040; sourceIp = vpc.cluster-vpc.cidrBlock; }
-      ];
-    };
+  ec2SecurityGroups.cluster-educator-api-private-sg = mkSG [
+    { fromPort =  4040; toPort =  4040; sourceIp = vpc.cluster-vpc.cidrBlock; }
+  ];
 
   vpcRouteTables.cluster-route-table =
     { resources, ... }:
