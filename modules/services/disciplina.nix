@@ -54,19 +54,19 @@ in
         ${keyScript}
       '';
     in
-      {
+      rec {
       after = [ "network.target" ] ++ keyServices;
-      requires = [ "network.target" ] ++ keyServices;
+      requires = after;
       wantedBy = [ "multi-user.target" ];
 
       environment.HOME = stateDir;
 
       script = ''
-        ${pkgs.disciplina}/bin/dscp-${cfg.type} ${attrsToFlags cfg.args}
+        exec ${pkgs.disciplina}/bin/dscp-${cfg.type} ${attrsToFlags cfg.args}
       '';
 
       serviceConfig = {
-        DynamicUser = "true";
+        DynamicUser = true;
         StateDirectory = "disciplina-${cfg.type}";
         WorkingDirectory = stateDir;
         ExecStartPre = "!${preStartScript}";
