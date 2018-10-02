@@ -5,13 +5,8 @@ let
 
   attrsToFlags = set:
     let
-      render = name: value:
-        "--" + name + (optionalString (isString value) (" " + value));
-
-      renderList = name: value:
-        if isList value
-        then map (render name) value
-        else [ (render name value) ];
+      render = name: value: "--" + name + (optionalString (isString value) (" " + value));
+      renderList = name: value: map (render name) (lib.toList value);
     in
     concatStringsSep " " (concatLists (mapAttrsToList renderList set));
 in
