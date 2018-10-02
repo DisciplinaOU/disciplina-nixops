@@ -96,7 +96,22 @@ Actual Disciplina cluster. WIP.
 
 ### Provisioning
 
-If you want to create a personal staging cluster, enter `nix-shell` and run:
+Some terminology first:
+
+* A `deployment` is an entry in a nixops state file.
+* A `cluster` is the set of resources created by running nixops for a given
+  deployment.
+
+* A `production` cluster, is the one served at the official DNS name.
+  Deployment access is restricted.
+* A `staging` cluster exists at `*.dscp.serokell.review` and can be updated by
+  most devs, QA, and ops with the `/deploy staging <ref>` slack command (not
+  implemented yet).
+* A `testing` cluster belongs to a single dev/qa/ops, and should generally not
+  be expected to be up or reliable, because chances are someone's working on
+  it.
+
+To create a new testing deployment, run the following:
 
 ```sh
 nixops create deployments/cluster.nix -d disciplina
@@ -104,22 +119,25 @@ nixops set-args --argstr domain yourname.disciplina.site -d disciplina
 nixops deploy -d disciplina
 ```
 
-Subsequent deploys should only run the last command. When you are done with
-your cluster and want to free up resources, run:
+Where `-d disciplina` can be replaced by any name you like, such as
+`discplina-testing` or `disciplina-kawaii`.
+
+To push changes to the cluster, re-run the last command.
+
+To clean up your cluster, which you should do when you're done with it to
+conserve money, run this:
 
 ```sh
-nixops destroy -d disciplina
+nixops destroy -d disciplina --confirm
 ```
 
-If you want to deploy production cluster, run:
+#### Deploying to production
+
+Do as above to create a deployment, skip the second step, and run this instead:
 
 ```sh
 nixops set-args --argstr env production -d disciplina
 nix-shell --argstr env production --run 'nixops deploy -d cluster -s state/cluster.nixops'
-nixops set-args --unset env -d disciplina
 ```
 
-Since `nixops set-args` permanently modifies a deployment, you need to unset it
-again if you want to deploy anywhere other than production. So the above
-snippet sets the environment, deploys, and usets it again (it defaults to
-staging).
+Re-run last command to push new changes.
