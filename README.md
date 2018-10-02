@@ -105,8 +105,8 @@ Some terminology first:
 * A `production` cluster, is the one served at the official DNS name.
   Deployment access is restricted.
 * A `staging` cluster exists at `*.dscp.serokell.review` and can be updated by
-  most devs, QA, and ops with the `/deploy staging <ref>` slack command (not
-  implemented yet).
+  most devs, QA, and ops with the `/deploy discplina@<ref> to staging` slack
+  command (not implemented yet).
 * A `testing` cluster belongs to a single dev/qa/ops, and should generally not
   be expected to be up or reliable, because chances are someone's working on
   it.
