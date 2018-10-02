@@ -49,35 +49,32 @@ in
 
   config = mkIf cfg.enable {
 
-    users.users.disciplina = {
-      home = "/var/lib/disciplina-${cfg.type}";
-      createHome = true;
-    };
-
     systemd.services."disciplina-${cfg.type}" = let
       cfgfile = "${stateDir}/config.yaml";
       stateDir = "/var/lib/disciplina-${cfg.type}";
+      keyServices = map (x: "${x}-key.service") cfg.keyFiles;
+      keyScript = concatMapStringsSep "\n" (x: "cp /run/keys/${x} /tmp/${x}; chown --reference=/tmp /tmp/${x}; chmod 400 /tmp/${x}") cfg.keyFiles;
+      preStartScript = pkgs.writeScript "disciplina-${cfg.type}-prestart.sh" ''
+        #!${pkgs.bash}/bin/bash -e
+        ${keyScript}
+      '';
     in
       {
-      after = [ "network.target" ] ++ (optionals (cfg.keyFiles != []) (map (x: "${x}-key.service") cfg.keyFiles));
-      requires = [ "network.target" ] ++ (optionals (cfg.keyFiles != []) (map (x: "${x}-key.service") cfg.keyFiles));
+      after = [ "network.target" ] ++ keyServices;
+      requires = [ "network.target" ] ++ keyServices;
       wantedBy = [ "multi-user.target" ];
 
-      preStart = (concatMapStringsSep "\n" (x: "cp /run/keys/${x} /tmp/${x}; chown disciplina /tmp/${x}; chmod 400 /tmp/${x}") cfg.keyFiles) + ''
-
-        # Empty line before this one is necessary because concatMapStringsSep doesn't end with a newline
-      '';
+      environment.HOME = stateDir;
 
       script = ''
         ${pkgs.disciplina}/bin/dscp-${cfg.type} ${attrsToFlags cfg.args}
       '';
 
       serviceConfig = {
-        PermissionsStartOnly = "true";
-        User = "disciplina";
-        # DynamicUser = "true";
-        # StateDirectory = "disciplina-${cfg.type}";
+        DynamicUser = "true";
+        StateDirectory = "disciplina-${cfg.type}";
         WorkingDirectory = stateDir;
+        ExecStartPre = "!${preStartScript}";
       };
     };
   };
