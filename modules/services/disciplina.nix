@@ -48,7 +48,7 @@ in
       cfgfile = "${stateDir}/config.yaml";
       stateDir = "/var/lib/disciplina-${cfg.type}";
       keyServices = map (x: "${x}-key.service") cfg.keyFiles;
-      keyScript = concatMapStringsSep "\n" (x: "cp /run/keys/${x} /tmp/${x}; chown --reference=/tmp /tmp/${x}; chmod 400 /tmp/${x}") cfg.keyFiles;
+      keyScript = concatMapStringsSep "\n" (x: "cp /run/keys/${x} /tmp/${x}; chmod 444 /tmp/${x}") cfg.keyFiles;
       preStartScript = pkgs.writeScript "disciplina-${cfg.type}-prestart.sh" ''
         #!${pkgs.bash}/bin/bash -e
         ${keyScript}
