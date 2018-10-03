@@ -45,7 +45,7 @@ in
     ];
 
     args = let
-      cat = name: ''"$(cat "/tmp/${name}" 2>/dev/null)"'';
+      cat = name: ''"$(cat "/tmp/${name}")"'';
       stateDir = "/var/lib/disciplina-witness";
     in {
       bind = address publicIPv4;
