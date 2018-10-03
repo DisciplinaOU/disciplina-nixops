@@ -65,14 +65,15 @@ in
     virtualHosts= {
       "${uris.witness}".locations."/".proxyPass = "http://witness";
       "${uris.educator}".locations."/".proxyPass = "http://educator";
-      "${uris.explorer}".locations."/".root = pkgs.disciplina-explorer-frontend.override { witnessUrl = "//${uris.witness}"; };
+      "${uris.explorer}".locations = {
+        "/api".proxyPass = "http://witness";
+        "/".root = pkgs.disciplina-explorer-frontend;
+      };
 
-      "${uris.faucet}" = {
-        locations = {
-          "= /api/faucet/v1/".index = "index.html";
-          "/api".proxyPass = "http://faucet";
-          "/".root = pkgs.disciplina-faucet-frontend.override { faucetUrl = "//${uris.faucet}"; };
-        };
+      "${uris.faucet}".locations = {
+        "= /api/faucet/v1/".index = "index.html";
+        "/api".proxyPass = "http://faucet";
+        "/".root = pkgs.disciplina-faucet-frontend.override { faucetUrl = "//${uris.faucet}"; };
       };
     };
   };
