@@ -1,9 +1,10 @@
-env: n: { lib, name, nodes, pkgs, resources, ... }: with lib;
+env: n: { lib, name, nodes, pkgs, resources, config, ... }: with lib;
 
 let
+  keys = config.dscp.keys;
   address = ip: ip + ":4010:4011";
-  inherit (nodes.witness-load-balancer.config.networking) publicIPv4;
-  isWitness = node: elem "witness" node.config.system.nixos.tags;
+  hasWitnessTag = node: elem "witness" node.config.system.nixos.tags;
+  hasInternalTag = node: elem "internal" node.config.system.nixos.tags;
   isInternal = n == 0;
 in
 
@@ -16,16 +17,7 @@ in
   );
 
   ## We do not allocate an elastic IP for the internal witness node, so don't try to associate it
-  deployment.ec2.elasticIPv4 = lib.mkIf isInternal (lib.mkForce "");
-
-  ##
-  # For each secret data point:
-  # * Add its file to deployment.keys
-  # * Add its name to services.disciplina-witness.keyFiles
-  # * Wrap its value in `services.disciplina-witness.args` with `cat`
-  deployment.keys = {
-    "witness-comm-sec".keyFile = ../../keys + "/${env}/witness/comm-sec";
-  };
+  deployment.ec2.elasticIPv4 = lib.mkIf (n == 0) (lib.mkForce "");
 
   networking.firewall.allowedTCPPorts = [
     4040 4041   # Witness ZMQ API
@@ -36,36 +28,31 @@ in
     enable = true;
     type = "witness";
 
-    ##
-    # These are copied to /tmp/${name}
-    # For use with `cat` helper function to wrap secrets
-    # Also adds dependency on nixops keyfile services
-    keyFiles = [
-      "witness-comm-sec"
-    ];
-
     args = let
-      cat = name: ''"$(cat "/tmp/${name}")"'';
+      cat = path: ''"$(cat "${path}")"'';
       stateDir = "/var/lib/disciplina-witness";
+
+      publicIP = ''"$(curl "http://169.254.169.254/latest/meta-data/public-ipv4")"'';
+      privateIP = ''"$(curl "http://169.254.169.254/latest/meta-data/local-ipv4")"'';
     in {
-      bind = address publicIPv4;
-      bind-internal = address "0.0.0.0";
+      bind = address (if isInternal then privateIP else publicIP);
+      bind-internal = address privateIP;
 
       db-path = "${stateDir}/witness.db";
 
       config-key = "alpha";
 
       comm-n = toString n;
-      comm-sec = cat "witness-comm-sec";
+      comm-sec = cat keys.committee-secret;
 
       config = toString pkgs.disciplina-config;
 
-      peer = map (node: address node.config.networking.privateIPv4)
-        (attrValues (filterAttrs (name2: node: name != name2 && isWitness node) nodes));
+      peer = map (node: address (if (hasInternalTag node) then node.config.networking.privateIPv4 else node.config.networking.publicIPv4))
+        (attrValues (filterAttrs (name2: node: name != name2 && hasWitnessTag node) nodes));
 
       witness-listen = "0.0.0.0:4030";
     };
   };
 
-  system.nixos.tags = [ "witness" ];
+  system.nixos.tags = [ "witness" ] ++ (optional isInternal "internal");
 }

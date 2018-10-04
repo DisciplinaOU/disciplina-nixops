@@ -9,6 +9,8 @@ let
       renderList = name: value: map (render name) (lib.toList value);
     in
     concatStringsSep " " (concatLists (mapAttrsToList renderList set));
+
+  stateDir = "/var/lib/disciplina-${cfg.type}";
 in
 
 {
@@ -32,44 +34,32 @@ in
         Set of arguments passed to witness CLI
       '';
     };
-
-    keyFiles = mkOption {
-      type = types.listOf types.str;
-      default = [];
-      description = ''
-        list of files from /run/keys to copy to /tmp
-      '';
-    };
   };
 
   config = mkIf cfg.enable {
 
-    systemd.services."disciplina-${cfg.type}" = let
-      cfgfile = "${stateDir}/config.yaml";
-      stateDir = "/var/lib/disciplina-${cfg.type}";
-      keyServices = map (x: "${x}-key.service") cfg.keyFiles;
-      keyScript = concatMapStringsSep "\n" (x: "cp /run/keys/${x} /tmp/${x}; chmod 444 /tmp/${x}") cfg.keyFiles;
-      preStartScript = pkgs.writeScript "disciplina-${cfg.type}-prestart.sh" ''
-        #!${pkgs.bash}/bin/bash -e
-        ${keyScript}
-      '';
-    in
-      rec {
-      after = [ "network.target" ] ++ keyServices;
+    users.users.disciplina = {
+      home = stateDir;
+      extraGroups = [ "keys" ];
+      createHome = true;
+      isSystemUser = true;
+    };
+
+    systemd.services."disciplina-${cfg.type}" = rec {
+      after = [ "network.target" ];
       requires = after;
       wantedBy = [ "multi-user.target" ];
 
-      environment.HOME = stateDir;
+      path = with pkgs; [ curl ];
 
       script = ''
         exec ${pkgs.disciplina}/bin/dscp-${cfg.type} ${attrsToFlags cfg.args}
       '';
 
       serviceConfig = {
-        DynamicUser = true;
-        StateDirectory = "disciplina-${cfg.type}";
+        User = "disciplina";
         WorkingDirectory = stateDir;
-        ExecStartPre = "!${preStartScript}";
+        StateDirectory = "disciplina-${cfg.type}";
       };
     };
   };

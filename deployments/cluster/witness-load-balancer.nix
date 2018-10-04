@@ -3,13 +3,13 @@
 env: domain: { config, lib, pkgs, resources, ... }:
 
 let
+  keys = config.dscp.keys;
   uris = {
     faucet = "faucet.${domain}";
     explorer = "explorer.${domain}";
     educator = "educator.${domain}";
     witness = "witness.${domain}";
   };
-
 in
 {
   deployment.route53.hostName = lib.mkForce "witness.${domain}";
@@ -17,8 +17,6 @@ in
   deployment.ec2.securityGroupIds = map (x: resources.ec2SecurityGroups."cluster-${x}-sg".name ) (
     [ "http-public" ]
   );
-
-  deployment.keys."faucet-key.json".keyFile = ../../keys + "/${env}/faucet-key.json";
 
   boot.kernel.sysctl = {
     "net.core.somaxconn" = 4096;
@@ -81,14 +79,13 @@ in
   services.disciplina = {
     enable = true;
     type = "faucet";
-    keyFiles = [ "faucet-key.json" ];
     args = {
       config = toString pkgs.disciplina-config;
       config-key = "alpha";
 
       appdir = "/var/lib/disciplina-faucet";
 
-      faucet-keyfile = "/tmp/faucet-key.json";
+      faucet-keyfile = keys.faucet-key;
 
       faucet-listen = "127.0.0.1:4014";
       translated-amount = "20";

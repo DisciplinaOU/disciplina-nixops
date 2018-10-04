@@ -1,9 +1,10 @@
 env: n: { lib, name, nodes, pkgs, resources, ... }: with lib;
 
 let
+  keys = config.dscp.keys;
   address = ip: ip + ":4010:4011";
-  inherit (nodes.witness-load-balancer.config.networking) publicIPv4;
-  isWitness = node: elem "witness" node.config.system.nixos.tags;
+  hasWitnessTag = node: elem "witness" node.config.system.nixos.tags;
+  hasInternalTag = node: elem "internal" node.config.system.nixos.tags;
 in
 
 {
@@ -19,51 +20,26 @@ in
     4040        # Educator HTTP API
   ];
 
-  ##
-  # For each secret data point:
-  # * Add its file to deployment.keys
-  # * Add its name to services.disciplina-witness.keyFiles
-  # * Wrap its value in `services.disciplina-witness.args` with `cat`
-  deployment.keys = {
-    "witness-comm-sec".keyFile = ../../keys + "/${env}/witness/comm-sec";
-  };
-
   services.disciplina = rec {
     enable = true;
     type = "educator";
 
-    ##
-    # These are copied to /tmp/${name}
-    # For use with `cat` helper function to wrap secrets
-    # Also adds dependency on nixops keyfile services
-    keyFiles = [
-      "witness-comm-sec"
-    ];
-
     args = let
-      cat = name: ''"$(cat "/tmp/${name}" 2>/dev/null)"'';
+      cat = path: ''"$(cat "${path}")"'';
       stateDir = "/var/lib/disciplina-${type}";
-    in {
-      ##
-      # --educator-keyfile $tmp_files/educator.key
-      # --educator-gen-key
-      # --sql-path $tmp_files/educator.db
-      # --educator-listen 127.0.0.1:8090
-      # --educator-bot
-      # --educator-bot-delay 3s
 
-      bind = address publicIPv4;
-      bind-internal = address "0.0.0.0";
+      publicIP = "$(curl http://169.254.169.254/latest/meta-data/public-ipv4 2>/dev/null)";
+      privateIP = "$(curl http://169.254.169.254/latest/meta-data/local-ipv4 2>/dev/null)";
+    in {
+      bind = address publicIP;
+      bind-internal = address privateIP;
 
       config-key = "alpha";
 
-      comm-n = toString n;
-      comm-sec = cat "witness-comm-sec";
-
       config = toString pkgs.disciplina-config;
 
-      peer = map (node: address node.config.networking.privateIPv4)
-        (attrValues (filterAttrs (name2: node: name != name2 && isWitness node) nodes));
+      peer = map (node: address (if (hasInternalTag node) then node.config.networking.privateIPv4 else node.config.networking.publicIPv4))
+        (attrValues (filterAttrs (name2: node: name != name2 && hasWitnessTag node) nodes));
 
       witness-listen = "0.0.0.0:4030";
       educator-listen = "0.0.0.0:4040";

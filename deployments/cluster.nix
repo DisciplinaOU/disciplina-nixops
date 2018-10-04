@@ -39,6 +39,12 @@
     services.sshguard.enable = true;
 
     networking.firewall.allowedTCPPorts = [ 22 ];
+
+    dscp.keydir = env;
+    dscp.keys = {
+      committee-secret = { user = "disciplina"; services = [ "disciplina-witness" ]; shared = false; };
+      faucet-key = { user = "disciplina"; services = [ "disciplina-faucet" ]; shared = false; };
+    };
   };
 
   resources = import ./cluster-resources.nix { inherit region env domain; };
