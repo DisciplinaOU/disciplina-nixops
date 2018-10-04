@@ -86,6 +86,8 @@ in
       config = toString pkgs.disciplina-config;
       config-key = "alpha";
 
+      appdir = "/var/lib/disciplina-faucet";
+
       faucet-keyfile = "/tmp/faucet-key.json";
 
       faucet-listen = "127.0.0.1:4014";
