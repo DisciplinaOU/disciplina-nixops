@@ -1,49 +1,40 @@
-env: n: { lib, name, nodes, pkgs, resources, config, ... }: with lib;
+env: n: { lib, name, nodes, pkgs, resources, ... }: with lib;
 
 let
   keys = config.dscp.keys;
   address = ip: ip + ":4010:4011";
   hasWitnessTag = node: elem "witness" node.config.system.nixos.tags;
   hasInternalTag = node: elem "internal" node.config.system.nixos.tags;
-  isInternal = n == 0;
 in
 
 {
   ##
   # `map` to make additional SGs easier to add and SG list more readable
   deployment.ec2.securityGroupIds = map (x: resources.ec2SecurityGroups."cluster-${x}-sg".name ) (
-    [ "witness-api-private" ] ++
-      (if isInternal then [ "witness-private" ] else [ "witness-public" ])
+    [ "educator-api-private" "witness-api-private" ]
   );
-
-  ## We do not allocate an elastic IP for the internal witness node, so don't try to associate it
-  deployment.ec2.elasticIPv4 = lib.mkIf (n == 0) (lib.mkForce "");
 
   networking.firewall.allowedTCPPorts = [
     4040 4041   # Witness ZMQ API
     4030        # Witness HTTP Wallet API
+    4040        # Educator HTTP API
   ];
 
-  services.disciplina = {
+  services.disciplina = rec {
     enable = true;
-    type = "witness";
+    type = "educator";
 
     args = let
       cat = path: ''"$(cat "${path}")"'';
-      stateDir = "/var/lib/disciplina-witness";
+      stateDir = "/var/lib/disciplina-${type}";
 
-      publicIP = ''"$(curl "http://169.254.169.254/latest/meta-data/public-ipv4")"'';
-      privateIP = ''"$(curl "http://169.254.169.254/latest/meta-data/local-ipv4")"'';
+      publicIP = "$(curl http://169.254.169.254/latest/meta-data/public-ipv4 2>/dev/null)";
+      privateIP = "$(curl http://169.254.169.254/latest/meta-data/local-ipv4 2>/dev/null)";
     in {
-      bind = address (if isInternal then privateIP else publicIP);
+      bind = address publicIP;
       bind-internal = address privateIP;
 
-      db-path = "${stateDir}/witness.db";
-
       config-key = "alpha";
-
-      comm-n = toString n;
-      comm-sec = cat keys.committee-secret;
 
       config = toString pkgs.disciplina-config;
 
@@ -51,8 +42,16 @@ in
         (attrValues (filterAttrs (name2: node: name != name2 && hasWitnessTag node) nodes));
 
       witness-listen = "0.0.0.0:4030";
+      educator-listen = "0.0.0.0:4040";
+
+      sql-path = "${stateDir}/educator.db";
+      educator-bot = true;
+      educator-bot-delay = "3s";
+
+      educator-keyfile = "${stateDir}/educator.key";
+      educator-gen-key = true;
     };
   };
 
-  system.nixos.tags = [ "witness" ] ++ (optional isInternal "internal");
+  system.nixos.tags = [ "educator" "witness" ];
 }
