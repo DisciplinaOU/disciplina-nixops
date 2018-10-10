@@ -20,36 +20,61 @@ in
     4040        # Educator HTTP API
   ];
 
-  services.disciplina = rec {
+  services.disciplina = let
+    config-key = "alpha";
+
+  in rec {
     enable = true;
     type = "educator";
 
+
+    config."${config-key}" = rec {
+      witness = rec {
+        appDir = "/var/lib/disciplina-${type}";
+        db.path = "${appDir}/witness.db";
+        api.addr = "0.0.0.0:4030";
+        keys = {
+          type = "basic";
+          path = "${appDir}/witness.key";
+          genNew = true;
+        };
+      };
+
+      educator = {
+        publishing.period = "30s";
+        db.mode = {
+          path = "${witness.appDir}/educator.sqlite";
+          connNum = 4;
+          maxPending = 100;
+        };
+
+        keys = {
+          path = "${witness.appDir}/educator.key";
+          genNew = true;
+        };
+
+        api = {
+          serverParams.addr = "0.0.0.0:4040";
+          botParams = {
+            operationsDelay = "3s";
+            seed = "super secure"; # I don't know whether or not this is sensitive data
+          };
+          studentAPINoAuth.enabled = false;
+          educatorAPINoAuth.enabled = false;
+        };
+      };
+    };
+
     args = let
       cat = path: ''"$(cat "${path}")"'';
-      stateDir = "/var/lib/disciplina-${type}";
-
       publicIP = "$(curl http://169.254.169.254/latest/meta-data/public-ipv4 2>/dev/null)";
       privateIP = "$(curl http://169.254.169.254/latest/meta-data/local-ipv4 2>/dev/null)";
     in {
+      inherit config-key;
       bind = address publicIP;
       bind-internal = address privateIP;
-
-      config-key = "alpha";
-
-      config = toString pkgs.disciplina-config;
-
       peer = map (node: address (if (hasInternalTag node) then node.config.networking.privateIPv4 else node.config.networking.publicIPv4))
         (attrValues (filterAttrs (name2: node: name != name2 && hasWitnessTag node) nodes));
-
-      witness-listen = "0.0.0.0:4030";
-      educator-listen = "0.0.0.0:4040";
-
-      sql-path = "${stateDir}/educator.db";
-      educator-bot = true;
-      educator-bot-delay = "3s";
-
-      educator-keyfile = "${stateDir}/educator.key";
-      educator-gen-key = true;
     };
   };
 

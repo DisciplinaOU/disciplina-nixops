@@ -2,7 +2,8 @@
 
 let
   cfg = config.services.disciplina;
-
+  mkConfig = configAttrs: pkgs.writeText "disciplina-config.yaml" (builtins.toJSON configAttrs);
+  stateDir = "/var/lib/disciplina-${cfg.type}";
   attrsToFlags = set:
     let
       render = name: value: "--" + name + (optionalString (isString value) (" " + value));
@@ -10,7 +11,6 @@ let
     in
     concatStringsSep " " (concatLists (mapAttrsToList renderList set));
 
-  stateDir = "/var/lib/disciplina-${cfg.type}";
 in
 
 {
@@ -24,6 +24,22 @@ in
         The type of node to spawn. Sets the systemd unit name to
         `disciplina-<type>`, state dir to `/var/lib/disciplina-<type>`, and
         runs `dscp-<type>`.
+      '';
+    };
+
+    upstreamConfigFile = mkOption {
+      type = types.package;
+      default = pkgs.disciplina-config;
+      description = ''
+        Upstream config file passed as first --config option to service.
+      '';
+    };
+
+    config = mkOption {
+      type = types.attrs;
+      default = {};
+      description = ''
+        Options written to the config.yaml file passed to the service.
       '';
     };
 
@@ -53,7 +69,7 @@ in
       path = with pkgs; [ curl ];
 
       script = ''
-        exec ${pkgs.disciplina}/bin/dscp-${cfg.type} ${attrsToFlags cfg.args}
+        exec ${pkgs.disciplina}/bin/dscp-${cfg.type} --config ${cfg.upstreamConfigFile} --config ${mkConfig cfg.config} ${attrsToFlags cfg.args}
       '';
 
       serviceConfig = {
