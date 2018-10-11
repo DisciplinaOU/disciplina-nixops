@@ -69,6 +69,7 @@ in
       path = with pkgs; [ curl ];
 
       script = ''
+        set -euxo pipefail
         exec ${pkgs.disciplina}/bin/dscp-${cfg.type} --config ${cfg.upstreamConfigFile} --config ${mkConfig cfg.config} ${attrsToFlags cfg.args}
       '';
 
