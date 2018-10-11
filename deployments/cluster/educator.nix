@@ -11,7 +11,7 @@ in
   ##
   # `map` to make additional SGs easier to add and SG list more readable
   deployment.ec2.securityGroupIds = map (x: resources.ec2SecurityGroups."cluster-${x}-sg".name ) (
-    [ "educator-api-private" "witness-api-private" ]
+    [ "educator-api-private" "witness-public" ]
   );
 
   networking.firewall.allowedTCPPorts = [
