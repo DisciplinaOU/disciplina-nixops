@@ -46,7 +46,7 @@ in
     in {
       inherit config-key;
       bind = address (if isInternal then privateIP else publicIP);
-      bind-internal = address privateIP;
+      bind-internal = address "*";
       comm-n = toString n;
       comm-sec = cat keys.committee-secret;
       peer = map (node: address (if (hasInternalTag node) then node.config.networking.privateIPv4 else node.config.networking.publicIPv4))
