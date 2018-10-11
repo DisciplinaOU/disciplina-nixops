@@ -15,7 +15,7 @@ in
   );
 
   networking.firewall.allowedTCPPorts = [
-    4040 4041   # Witness ZMQ API
+    4010 4011   # Witness ZMQ API
     4030        # Witness HTTP Wallet API
     4040        # Educator HTTP API
   ];

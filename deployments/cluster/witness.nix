@@ -22,7 +22,7 @@ in
   deployment.ec2.elasticIPv4 = lib.mkIf (n == 0) (lib.mkForce "");
 
   networking.firewall.allowedTCPPorts = [
-    4040 4041   # Witness ZMQ API
+    4010 4011   # Witness ZMQ API
     4030        # Witness HTTP Wallet API
   ];
 
