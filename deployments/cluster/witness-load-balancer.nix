@@ -65,7 +65,7 @@ in
       "${uris.educator}".locations."/".proxyPass = "http://educator";
       "${uris.explorer}".locations = {
         "/api".proxyPass = "http://witness";
-        "/".root = pkgs.disciplina-explorer-frontend;
+        "/".root = pkgs.disciplina-explorer-frontend.override { witnessUrl = "//${uris.witness}"; };
       };
 
       "${uris.faucet}".locations = {
