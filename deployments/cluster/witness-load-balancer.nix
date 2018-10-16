@@ -65,7 +65,7 @@ in
       "${uris.educator}".locations."/".proxyPass = "http://educator";
       "${uris.explorer}".locations = {
         "/api".proxyPass = "http://witness";
-        "/".root = pkgs.disciplina-explorer-frontend;
+        "/".root = pkgs.disciplina-explorer-frontend.override { witnessUrl = "//${uris.witness}"; };
       };
 
       "${uris.faucet}".locations = {
@@ -76,20 +76,26 @@ in
     };
   };
 
-  services.disciplina = {
+  services.disciplina = let
+    config-key = "alpha";
+
+  in rec {
     enable = true;
     type = "faucet";
+
+    config."${config-key}".faucet = {
+      appDir = "/var/lib/disciplina-${type}";
+      api.addr = "127.0.0.1:4014";
+      witnessBackend = "http://witness1:4030";
+      transferredAmount = 20;
+      keys = {
+        path = toString keys.faucet-key;
+        genNew = false;
+      };
+    };
+
     args = {
-      config = toString pkgs.disciplina-config;
-      config-key = "alpha";
-
-      appdir = "/var/lib/disciplina-faucet";
-
-      faucet-keyfile = keys.faucet-key;
-
-      faucet-listen = "127.0.0.1:4014";
-      translated-amount = "20";
-      witness-backend = "http://witness1:4030";
+      inherit config-key;
     };
   };
 }
