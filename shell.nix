@@ -15,5 +15,6 @@ stdenv.mkDerivation {
     "disciplina-faucet-frontend=https://github.com/DisciplinaOU/disciplina-faucet-frontend/archive/master.tar.gz"
     "disciplina-explorer-frontend=https://github.com/DisciplinaOU/disciplina-explorer-frontend/archive/master.tar.gz"
     "disciplina-validatorcv=https://github.com/DisciplinaOU/disciplina-validatorcv/archive/master.tar.gz"
+    "educator_aaa=https://github.com/DisciplinaOU/educator_aaa/archive/master.tar.gz"
   ];
 }

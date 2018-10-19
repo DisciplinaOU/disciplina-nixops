@@ -20,6 +20,11 @@ in
     4040        # Educator HTTP API
   ];
 
+  services.educator_aaa = {
+    enable = true;
+    port = 4000;
+  };
+
   services.disciplina = let
     config-key = "alpha";
 
