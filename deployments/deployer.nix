@@ -20,9 +20,9 @@
       buildkite-token.keyFile = ../keys/production/buildkite-token;
 
       # Continuous delivery secrets
-      "aws-credentials".keyFile = ../keys/staging/aws-credentials;
-      "faucet-key.json".keyFile = ../keys/staging/faucet-key.json;
-      "witness.yaml".keyFile = ../keys/staging/witness.yaml;
+      # "aws-credentials".keyFile = ../keys/staging/aws-credentials;
+      # "faucet-key.json".keyFile = ../keys/staging/faucet-key.json;
+      # "witness.yaml".keyFile = ../keys/staging/witness.yaml;
     };
 
     networking.hostName = "disciplina-deployer";
