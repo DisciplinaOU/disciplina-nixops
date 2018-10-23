@@ -1,4 +1,5 @@
-{ pkgs ? import ./pkgs.nix, env ? "staging" }:
+{ pkgs ? import ./pkgs.nix
+, env ? "staging" }:
 
 with pkgs;
 
@@ -9,6 +10,8 @@ stdenv.mkDerivation {
   AWS_ACCESS_KEY_ID = "default";
   AWS_SHARED_CREDENTIALS_FILE = "${toString ./.}/keys/${env}/aws-credentials";
 
+  # Fancy way to share this variable with nixops
+  NIX_ENV = env;
   NIX_PATH = lib.concatStringsSep ":" [
     "nixpkgs=${pkgs.path}"
     "disciplina=https://github.com/DisciplinaOU/disciplina/archive/master.tar.gz"

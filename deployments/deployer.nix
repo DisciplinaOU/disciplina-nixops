@@ -1,4 +1,5 @@
-{ region ? "eu-west-2" }:
+{ region ? "eu-west-2"
+, env ? builtins.getEnv "NIX_ENV" }:
 
 {
   network.description = "Disciplina deployer";
