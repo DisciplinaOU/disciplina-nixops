@@ -50,6 +50,7 @@
       tags = lib.concatStringsSep "," [
         "hostname=${config.networking.hostName}"
         "system=${pkgs.system}"
+        "queue=${env}"
       ];
 
       tokenPath = "/run/keys/buildkite-token";
