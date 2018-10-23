@@ -22,7 +22,6 @@ in
 
   services.educator_aaa = {
     enable = true;
-    port = 4000;
   };
 
   services.disciplina = let

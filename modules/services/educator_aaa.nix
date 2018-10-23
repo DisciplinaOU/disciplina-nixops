@@ -19,12 +19,13 @@ in
 
     port = mkOption {
       type = types.int;
+      default = 4000;
     };
   };
 
   config = mkIf cfg.enable {
     users.users.educator_aaa = {
-      home = "/var/lib/${stateDir}";
+      home = stateDir;
       createHome = true;
       isSystemUser = true;
     };
@@ -60,7 +61,7 @@ in
 
       environment = {
         MIX_ENV = "prod";
-        RELEASE_MUTABLE_DIR = "/var/lib/${stateDir}";
+        RELEASE_MUTABLE_DIR = stateDir;
         PORT = toString cfg.port;
         DATABASE_URL = "postgres://educator_aaa:educator_aaa@localhost/educator_aaa";
       };
@@ -72,8 +73,8 @@ in
       serviceConfig = {
         EnvironmentFile = toString keys.educator_aaa;
         User = "educator_aaa";
-        WorkingDirectory = "/var/lib/${stateDir}";
-        StateDirectory = stateDir;
+        WorkingDirectory = stateDir;
+        StateDirectory = stateDirName;
       };
     };
   };
