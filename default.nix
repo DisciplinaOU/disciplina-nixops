@@ -1,8 +1,6 @@
 { pkgs ? import ./pkgs.nix }: with pkgs;
 
 let
-  nixops = callPackage ./pkgs/nixops {};
-
   evalMachineInfo = import "${nixops}/share/nix/nixops/eval-machine-info.nix";
 
   evalNixOps = deployment: evalMachineInfo {

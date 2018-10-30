@@ -22,13 +22,7 @@
       hostname = "${name}.${domain}";
     };
 
-    nixpkgs.overlays = [(final: previous: let inherit (final) callPackage; in {
-      inherit (import <disciplina/release.nix> { })
-        disciplina-config
-        disciplina;
-      disciplina-faucet-frontend = callPackage <disciplina-faucet-frontend/release.nix> {};
-      disciplina-explorer-frontend = callPackage <disciplina-explorer-frontend/release.nix> {};
-    })];
+    nixpkgs.pkgs = import <closure>;
 
     services.nginx = {
       recommendedOptimisation = true;

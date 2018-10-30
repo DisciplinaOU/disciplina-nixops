@@ -2,9 +2,13 @@ final: previous:
 
 let
   inherit (final) callPackage fetchpatch;
-in
 
-{
+  disciplina-attrs = (import "${fetchGit {
+    url = https://github.com/DisciplinaOU/disciplina;
+    ref = "master";
+  }}/release.nix") {};
+
+in {
   aws-rotate-key = previous.aws-rotate-key.overrideAttrs (super: {
     patches = (super.patches or []) ++ [(fetchpatch {
       url = https://github.com/Fullscreen/aws-rotate-key/commit/5606b4c2e2a395560618126a3c1e2afaf1c0d2f3.patch;
@@ -24,4 +28,16 @@ in
   nixops = callPackage ./nixops {
     inherit (previous) nixops;
   };
+
+  inherit (disciplina-attrs) disciplina-config disciplina;
+
+  disciplina-faucet-frontend = callPackage "${fetchGit {
+    url = https://github.com/DisciplinaOU/disciplina-faucet-frontend;
+    ref = "sandboxed";
+  }}/release.nix" {};
+
+  disciplina-explorer-frontend = callPackage "${fetchGit {
+    url = https://github.com/DisciplinaOU/disciplina-explorer-frontend;
+    ref = "sandboxed";
+  }}/release.nix" {};
 }
