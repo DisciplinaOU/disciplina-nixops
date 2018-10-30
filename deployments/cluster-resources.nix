@@ -111,7 +111,7 @@ in rec {
   };
 
   route53RecordSets = let
-    lib = (import <closure>).lib;
+    lib = (import ../pkgs.nix).lib;
     lastN = count: list: lib.drop (lib.length list - count) list;
     domainToZone = d: ((lib.concatStringsSep "." (lastN 2 (lib.splitString "." d))) + ".");
     mkLBCname = d:

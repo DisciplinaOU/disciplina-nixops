@@ -22,7 +22,7 @@
       hostname = "${name}.${domain}";
     };
 
-    nixpkgs.pkgs = import <closure>;
+    nixpkgs.pkgs = import ../pkgs.nix;
 
     services.nginx = {
       recommendedOptimisation = true;

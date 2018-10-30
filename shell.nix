@@ -11,6 +11,5 @@ stdenv.mkDerivation {
 
   NIX_PATH = lib.concatStringsSep ":" [
     "nixpkgs=${pkgs.path}"
-    "closure=${./pkgs.nix}"
   ];
 }
