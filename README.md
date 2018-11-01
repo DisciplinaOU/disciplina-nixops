@@ -134,6 +134,12 @@ nixops deploy -d disciplina
 Where `-d disciplina` can be replaced by any name you like, such as
 `discplina-testing` or `disciplina-kawaii`.
 
+In order to create a local deployment using VMs, before `nixops deploy`, run:
+
+```sh
+nixops set-args --argstr hostType virtualbox -d disciplina
+```
+
 To push changes to the cluster, re-run the last command.
 
 To clean up your cluster, which you should do when you're done with it to

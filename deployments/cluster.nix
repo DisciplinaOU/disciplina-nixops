@@ -1,11 +1,14 @@
-{ region ? "eu-west-2", domain ? "see-readme.disciplina.site", env ? "staging" }:
+{ region ? "eu-west-2", domain ? "see-readme.disciplina.site", env ? "staging"
+, hostType ? "ec2", pkgs ? import ../pkgs.nix }:
+
 {
   network.description = "Disciplina cluster";
 
   defaults = { resources, lib, name, ... }: {
     imports = [ ../modules ];
 
-    deployment.targetEnv = "ec2";
+    deployment.targetEnv = hostType;
+    deployment.virtualbox.memorySize = 512; # MiB
     deployment.ec2 = with resources; {
       inherit region;
       associatePublicIpAddress = lib.mkDefault true;
@@ -22,7 +25,9 @@
       hostname = "${name}.${domain}";
     };
 
-    nixpkgs.pkgs = import ../pkgs.nix;
+    system.nixos.tags = lib.optional (hostType == "virtualbox") "internal";
+
+    nixpkgs.pkgs = pkgs;
 
     services.nginx = {
       recommendedOptimisation = true;
@@ -41,7 +46,8 @@
     };
   };
 
-  resources = import ./cluster-resources.nix { inherit region env domain; };
+  resources = pkgs.lib.optionalAttrs (hostType == "ec2")
+    (import ./cluster-resources.nix { inherit region env domain; });
 
   witness-load-balancer = import ./cluster/witness-load-balancer.nix env domain;
 
