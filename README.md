@@ -115,7 +115,7 @@ To create a new testing deployment, run the following:
 
 ```sh
 nixops create deployments/cluster.nix -d disciplina
-nixops set-args --argstr domain yourname.disciplina.site -d disciplina
+nixops set-args --argstr domain yourname.dscp.serokell.review -d disciplina
 nixops deploy -d disciplina
 ```
 
