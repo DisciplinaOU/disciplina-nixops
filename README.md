@@ -111,6 +111,18 @@ Some terminology first:
   be expected to be up or reliable, because chances are someone's working on
   it.
 
+#### IMPORTANT
+
+You need a patched version of nix. Upstream PR is currently pending. The correct
+version is provided as part of the overlay used in this repo. To install it,
+`cd` into repo base, and:
+
+```sh
+nix-env -f pkgs.nix -iA nix
+```
+
+#### Creating the deployment
+
 To create a new testing deployment, run the following:
 
 ```sh
