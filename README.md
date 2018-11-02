@@ -141,3 +141,49 @@ nix-shell --argstr env production --run 'nixops deploy -d cluster -s state/clust
 ```
 
 Re-run last command to push new changes.
+
+### Overriding dependencies
+
+These dependencies are handled on the NIX_PATH:
+
+* disciplina
+* disciplina-explorer-frontend
+* disciplina-faucet-frontend
+
+The default values for them are set in `shell.nix`, and point to the `master`
+branch of their respective repositories on Github.
+
+The easy way to provide an override is to modify the nixops deployment.
+
+The basic premise is to provide it the option `-I name=path`, where `name` is
+one of the above you wish to override, and where path is either a local path or
+a URL (like the default values, which point at tarballs of git branches on github)
+
+So, for example, for development you might want to point at a local git clone of
+`disciplina`, so you can manually `git` around, try patches, etc.
+
+Of course, you need to create a deployment first, as above. Then, modify the
+deployment with a NIX_PATH override:
+
+```sh
+nixops modify -d disciplina -I disciplina=$HOME/path/to/disciplina deployments/cluster.nix
+```
+
+Please note that `modify` is not incremental. If you do the above, and then
+this, it will remove the override. Each call to `modify` needs to include all
+arguments, including `deployments/cluster.nix`.
+
+```sh
+nixops modify -d disciplina deployments/cluster.nix
+```
+
+#### Pointing at a github archive
+
+Github provides archive URIs which export tarballs of any valid git ref. Use the
+following format:
+
+```
+https://github.com/<owner>/<repo>/archive/<ref>.tar.gz
+```
+
+Where `ref` can be any valid ref, including branch names, tag names, commit refs.
