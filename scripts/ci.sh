@@ -13,4 +13,4 @@ function cleanup {
   rm -f "$NIXOPS_STATE"
 }
 
-trap finish EXIT
+trap cleanup EXIT
