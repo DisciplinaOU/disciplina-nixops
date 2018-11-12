@@ -1,14 +1,6 @@
 { pkgs ? import ./pkgs.nix, env ? "staging" }:
 
-with import pkgs.path {
-  overlays = [ (import ./pkgs) ];
-};
-
-let
-  overlay = runCommand "nixpkgs-overlays" {} ''
-    mkdir -p $out && ln -s ${toString ./.}/pkgs $_
-  '';
-in
+with pkgs;
 
 stdenv.mkDerivation {
   name = "disciplina-nixops";
@@ -19,9 +11,8 @@ stdenv.mkDerivation {
 
   NIX_PATH = lib.concatStringsSep ":" [
     "nixpkgs=${pkgs.path}"
-    "nixpkgs-overlays=${overlay}"
     "disciplina=https://github.com/DisciplinaOU/disciplina/archive/master.tar.gz"
-    "disciplina-faucet-frontend=https://github.com/DisciplinaOU/disciplina-faucet-frontend/archive/master.tar.gz"
-    "disciplina-explorer-frontend=https://github.com/DisciplinaOU/disciplina-explorer-frontend/archive/master.tar.gz"
+    "disciplina-faucet-frontend=https://github.com/DisciplinaOU/disciplina-faucet-frontend/archive/sandboxed.tar.gz"
+    "disciplina-explorer-frontend=https://github.com/DisciplinaOU/disciplina-explorer-frontend/archive/sandboxed.tar.gz"
   ];
 }

@@ -2,9 +2,8 @@ final: previous:
 
 let
   inherit (final) callPackage fetchpatch;
-in
 
-{
+in {
   aws-rotate-key = previous.aws-rotate-key.overrideAttrs (super: {
     patches = (super.patches or []) ++ [(fetchpatch {
       url = https://github.com/Fullscreen/aws-rotate-key/commit/5606b4c2e2a395560618126a3c1e2afaf1c0d2f3.patch;
@@ -24,4 +23,8 @@ in
   nixops = callPackage ./nixops {
     inherit (previous) nixops;
   };
+
+  inherit (import <disciplina/release.nix> {}) disciplina-config disciplina;
+  disciplina-faucet-frontend = callPackage <disciplina-faucet-frontend/release.nix> {};
+  disciplina-explorer-frontend = callPackage <disciplina-explorer-frontend/release.nix> {};
 }
