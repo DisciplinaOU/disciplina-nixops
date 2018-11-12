@@ -59,6 +59,7 @@ in
         api = {
           serverParams.addr = "0.0.0.0:4040";
           botParams = {
+            enabled = true;
             operationsDelay = "3s";
             seed = "super secure"; # I don't know whether or not this is sensitive data
           };
