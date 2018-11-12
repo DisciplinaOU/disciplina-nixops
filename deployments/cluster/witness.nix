@@ -41,12 +41,9 @@ in
 
     args = let
       cat = path: ''"$(cat "${path}")"'';
-      publicIP = ''"$(curl "http://169.254.169.254/latest/meta-data/public-ipv4" 2>/dev/null)"'';
-      privateIP = ''"$(curl "http://169.254.169.254/latest/meta-data/local-ipv4" 2>/dev/null)"'';
     in {
       inherit config-key;
-      bind = address (if isInternal then privateIP else publicIP);
-      bind-internal = address "*";
+      bind = address "*";
       comm-n = toString n;
       comm-sec = cat keys.committee-secret;
       peer = map (node: address (if (hasInternalTag node) then node.config.networking.privateIPv4 else node.config.networking.publicIPv4))
