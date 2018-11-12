@@ -1,5 +1,6 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/usr/bin/env nix-shell
+#! nix-shell ../shell.nix -i bash
+set -exuo pipefail
 
 declare -a NIXOPS_OPTIONS DEPLOY_FIRST
 NIXOPS_OPTIONS=( -d disciplina --show-trace )
