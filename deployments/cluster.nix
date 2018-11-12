@@ -8,7 +8,13 @@
     imports = [ ../modules ];
 
     deployment.targetEnv = hostType;
-    deployment.virtualbox.memorySize = 512; # MiB
+
+    deployment.virtualbox = {
+      headless = true;
+      memorySize = 512;
+      vcpu = 2;
+    };
+
     deployment.ec2 = with resources; {
       inherit region;
       associatePublicIpAddress = lib.mkDefault true;
