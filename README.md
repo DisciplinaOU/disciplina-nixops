@@ -134,20 +134,66 @@ nixops deploy -d disciplina
 Where `-d disciplina` can be replaced by any name you like, such as
 `discplina-testing` or `disciplina-kawaii`.
 
-In order to create a local deployment using VMs, before `nixops deploy`, run:
-
-```sh
-nixops set-args --argstr hostType virtualbox -d disciplina
-```
-
 To push changes to the cluster, re-run the last command.
 
-To clean up your cluster, which you should do when you're done with it to
-conserve money, run this:
+When not actively working on your cluster, you should shut it down:
+
+```sh
+nixops stop -d disciplina --confirm
+```
+
+You can start it back up with:
+
+```sh
+nixops start -d disciplina --confirm
+```
+
+To clean up your cluster, which you should do when you're done with it:
 
 ```sh
 nixops destroy -d disciplina --confirm
 ```
+
+#### Deploying locally
+
+You should only deploy to AWS if you have a good reason for it. You can deploy
+to your local computer by spawning VirtualBox machines, which is much faster.
+
+The entire cluster will need ~2Gb of RAM and 13Gb of HDD space once deployed and running.
+
+##### Setup
+
+You will need to install VirtualBox.
+
+On NixOS, add the following to your `configuration.nix`:
+```
+  virtualisation.virtualbox.host.enable = true;
+```
+
+For other Linux distributions, it's probably in your repositories.
+
+On other systems, visit the [VirtualBox
+website](https://www.virtualbox.org/wiki/Downloads) to download and install.
+
+##### Important!
+
+From the nixops manual:
+> Note that for this to work the vboxnet0 network has to exist - you can add it in
+> the VirtualBox general settings under Networks - Host-only Networks if
+> necessary.
+
+##### Deployment
+
+Replace `<name>` with what you want to call this deployment. For example,
+`disciplina-vm` or `disciplina-local`. Use a unique name.
+
+```sh
+nixops create deployments/cluster.nix -d <name>
+nixops set-args --argstr hostType virtualbox -d <name>
+```
+
+You can stop and start the cluster same as above. This will stop all VMs. You
+will also need to start the deployment after rebooting your machine.
 
 #### Deploying to production
 
