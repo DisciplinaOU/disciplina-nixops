@@ -21,4 +21,5 @@ in {
   disciplina-faucet-frontend = callPackage <disciplina-faucet-frontend/release.nix> {};
   disciplina-explorer-frontend = callPackage <disciplina-explorer-frontend/release.nix> {};
   disciplina-validatorcv = callPackage <disciplina-validatorcv/release.nix> {};
+  educator_aaa = callPackage <educator_aaa> {};
 }
