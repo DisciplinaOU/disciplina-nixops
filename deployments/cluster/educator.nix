@@ -61,7 +61,7 @@ in
           botParams = {
             enabled = true;
             operationsDelay = "3s";
-            seed = "super secure"; # I don't know whether or not this is sensitive data
+            seed = "super secure"; # this is not sensitive data (https://serokell.slack.com/archives/CC92X27D3/p1542652947445200)
           };
           studentAPINoAuth.enabled = false;
           educatorAPINoAuth.enabled = false;
