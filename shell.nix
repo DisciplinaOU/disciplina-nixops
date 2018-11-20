@@ -12,7 +12,7 @@ stdenv.mkDerivation {
   NIX_PATH = lib.concatStringsSep ":" [
     "nixpkgs=${pkgs.path}"
     "disciplina=https://github.com/DisciplinaOU/disciplina/archive/master.tar.gz"
-    "disciplina-faucet-frontend=https://github.com/DisciplinaOU/disciplina-faucet-frontend/archive/sandboxed.tar.gz"
-    "disciplina-explorer-frontend=https://github.com/DisciplinaOU/disciplina-explorer-frontend/archive/sandboxed.tar.gz"
+    "disciplina-faucet-frontend=https://github.com/DisciplinaOU/disciplina-faucet-frontend/archive/master.tar.gz"
+    "disciplina-explorer-frontend=https://github.com/DisciplinaOU/disciplina-explorer-frontend/archive/master.tar.gz"
   ];
 }
