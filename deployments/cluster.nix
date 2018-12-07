@@ -3,6 +3,7 @@
 
 {
   network.description = "Disciplina cluster";
+  require = [ ./cluster-resources.nix ];
 
   defaults = { resources, lib, name, ... }: {
     imports = [ ../modules ];
@@ -19,9 +20,8 @@
       inherit region;
       associatePublicIpAddress = lib.mkDefault true;
       ebsInitialRootDiskSize = lib.mkDefault 30;
-      elasticIPv4 = if (env == "production") then elasticIPs."${name}-ip" else "";
       instanceType = lib.mkDefault "t2.medium";
-      keyPair = ec2KeyPairs.cluster-key;
+      instanceProfile = "ReadDisciplinaSecrets";
       securityGroupIds = [ ec2SecurityGroups.cluster-ssh-public-sg.name ];
       subnetId = lib.mkForce vpcSubnets.cluster-subnet;
     };
@@ -45,11 +45,19 @@
 
     networking.firewall.allowedTCPPorts = [ 22 ];
 
-    dscp.keydir = env;
-    dscp.keys = {
-      committee-secret = { user = "disciplina"; services = [ "disciplina-witness" ]; shared = false; };
-      faucet-key = { user = "disciplina"; services = [ "disciplina-faucet" ]; shared = false; };
+    awskeys = {
+      committee-secret = {
+        services = [ "disciplina-witness" ];
+        secretId = "${env}/disciplina/cluster";
+        key = "committee-secret";
+      };
+      faucet-key = {
+        services = [ "disciplina-faucet" ];
+        secretId = "${env}/disciplina/cluster";
+        key = "faucet-key";
+      };
     };
+    # aws secretsmanager get-secret-value --secret-id ${env}/disciplina/cluster | jq -r .SecretString
   };
 
   resources = pkgs.lib.optionalAttrs (hostType == "ec2")
@@ -57,10 +65,10 @@
 
   balancer = import ./cluster/balancer.nix env domain;
 
-  witness0 = import ./cluster/witness.nix env 0;
-  witness1 = import ./cluster/witness.nix env 1;
-  witness2 = import ./cluster/witness.nix env 2;
-  witness3 = import ./cluster/witness.nix env 3;
+  witness0 = import ./cluster/witness.nix 0;
+  witness1 = import ./cluster/witness.nix 1;
+  witness2 = import ./cluster/witness.nix 2;
+  witness3 = import ./cluster/witness.nix 3;
 
-  educator = import ./cluster/educator.nix env 4;
+  educator = import ./cluster/educator.nix;
 }

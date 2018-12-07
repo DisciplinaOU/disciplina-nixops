@@ -2,18 +2,21 @@
 , env ? builtins.getEnv "NIX_ENV" }:
 
 {
-  network.description = "Disciplina deployer";
+  network.description = "Disciplina - shared infra";
+  require = [ ./shared-resources.nix ];
 
-  deployer-instance = { config, lib, pkgs, resources, ... }: {
+  disciplina-deployer = { config, lib, pkgs, resources, ... }: {
     deployment.targetEnv = "ec2";
 
     deployment.ec2 = {
       inherit region;
+      keyPair = resources.ec2KeyPairs.deployer-keypair;
 
       ebsInitialRootDiskSize = 256;
       instanceType = "t2.xlarge";
-      keyPair = resources.ec2KeyPairs.deployer-key;
-      securityGroups = [ resources.ec2SecurityGroups.deployer-ssh.name ];
+      instanceProfile = "ReadDisciplinaSecrets";
+      securityGroupIds = with resources.ec2SecurityGroups;
+        [ ssh-public-sg.name ];
     };
 
     deployment.keys = {
@@ -41,30 +44,20 @@
     nixpkgs.overlays = [ (import ../pkgs) ];
 
     services.buildkite-agent = {
-      enable = true;
-      package = pkgs.buildkite-agent3;
+      #enable = true;
 
       runtimePackages = with pkgs; [ bash gnutar nix-with-cachix ];
 
-      # TODO: make into an attrset
-      tags = lib.concatStringsSep "," [
-        "hostname=${config.networking.hostName}"
-        "system=${pkgs.system}"
-        "queue=${env}"
-      ];
+      tags.hostname = config.networking.hostName;
+      tags.system = pkgs.system;
 
-      tokenPath = "/run/keys/buildkite-token";
+      # tokenPath = "${config.awsKeys.buildkite-token.path}";
     };
+
+    # awsKeys.buildkite-token = {
+    #   services = [ "buildkite-agent" ];
+    #   secretId = "${env}/disciplina/deployment";
+    # };
   };
 
-  resources.ec2KeyPairs.deployer-key = { inherit region; };
-
-  resources.ec2SecurityGroups.deployer-ssh = {
-    inherit region;
-    rules = [{
-      fromPort = 22;
-      toPort = 22;
-      sourceIp = "0.0.0.0/0";
-    }];
-  };
 }
