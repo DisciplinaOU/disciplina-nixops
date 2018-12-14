@@ -1,4 +1,4 @@
-n: { lib, name, nodes, pkgs, resources, config, ... }: with lib;
+n: r: { lib, name, nodes, pkgs, resources, config, ... }: with lib;
 
 let
   keys = config.dscp.keys;
@@ -16,6 +16,7 @@ in
       then [ "witness-private" ]
       else [ "witness-public" ])
   );
+  deployment.ec2.subnetId = lib.mkForce resources.vpcSubnets."cluster-${r}-subnet";
 
   networking.firewall.allowedTCPPorts = [
     4010 4011   # Witness ZMQ API

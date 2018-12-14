@@ -5,13 +5,17 @@ with pkgs;
 
 stdenv.mkDerivation {
   name = "disciplina-nixops";
-  nativeBuildInputs = [ git-crypt nixops sqlite ];
+  nativeBuildInputs = [
+    awscli
+    git-crypt
+    nixops
+    sqlite
+  ];
 
   AWS_ACCESS_KEY_ID = "default";
   AWS_SHARED_CREDENTIALS_FILE = "${toString ./.}/keys/${env}/aws-credentials";
 
-  # Fancy way to share this variable with nixops
-  NIX_ENV = env;
+  NIX_ENV = env; # Fancy way to share this variable with nixops
   NIX_PATH = lib.concatStringsSep ":" [
     "nixpkgs=${pkgs.path}"
     "disciplina=https://github.com/DisciplinaOU/disciplina/archive/master.tar.gz"

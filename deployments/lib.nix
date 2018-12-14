@@ -1,8 +1,9 @@
 rec {
   optionalCall = x: y: if builtins.isFunction x then x y else x;
-  withVPC = vpc: resource: { resources, lib, ... }@arg: (optionalCall resource (arg // { vpc = resources.vpc.${vpc}; })) // {
-    inherit (resources.vpc.${vpc}) region;
-    vpcId = resources.vpc.${vpc};
+  withVPC = vpc: resource: { resources, lib, ... }@arg:
+    (optionalCall resource (arg // { vpc = resources.vpc.${vpc}; })) // {
+      inherit (resources.vpc.${vpc}) region;
+      vpcId = resources.vpc.${vpc};
   };
   publicSubnet = vpc: zone: cidrBlock: withVPC vpc {
     inherit cidrBlock zone;
@@ -29,11 +30,13 @@ rec {
     destinationCidrBlock = "0.0.0.0/0";
     gatewayId = resources.vpcInternetGateways.${gateway};
   };
+
   rta.associate = subnet: table: { resources, ... }: {
     inherit (resources.vpcRouteTables.${table}) region;
     subnetId = resources.vpcSubnets.${subnet};
     routeTableId = resources.vpcRouteTables.${table};
   };
+
   # dns = zones: {
   #   lib = (import ../pkgs.nix).lib;
   #   lastN = count: list: lib.drop (lib.length list - count) list;

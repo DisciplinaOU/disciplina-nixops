@@ -1,6 +1,6 @@
 # TODO: add AWS ALB to NixOps and use that instead
 
-env: domain: { config, lib, pkgs, resources, ... }:
+env: domain: r: { config, lib, pkgs, resources, ... }:
 
 let
   keys = config.dscp.keys;
@@ -18,6 +18,8 @@ in
   deployment.ec2.securityGroupIds = map (x: resources.ec2SecurityGroups."cluster-${x}-sg".name ) (
     [ "http-public" ]
   );
+
+  deployment.ec2.subnetId = lib.mkForce resources.vpcSubnets."cluster-${r}-subnet";
 
   boot.kernel.sysctl = {
     "net.core.somaxconn" = 4096;

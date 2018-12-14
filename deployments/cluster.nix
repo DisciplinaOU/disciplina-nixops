@@ -3,8 +3,7 @@
 
 {
   network.description = "Disciplina cluster";
-  require = [ ./cluster-resources.nix ];
-
+  require = [ ./shared-resources.nix ];
   defaults = { resources, lib, name, ... }: {
     imports = [ ../modules ];
 
@@ -18,12 +17,13 @@
 
     deployment.ec2 = with resources; {
       inherit region;
+      keyPair = ec2KeyPairs.cluster-keypair;
       associatePublicIpAddress = lib.mkDefault true;
       ebsInitialRootDiskSize = lib.mkDefault 30;
       instanceType = lib.mkDefault "t2.medium";
       instanceProfile = "ReadDisciplinaSecrets";
       securityGroupIds = [ ec2SecurityGroups.cluster-ssh-public-sg.name ];
-      subnetId = lib.mkForce vpcSubnets.cluster-subnet;
+      # subnetId = lib.mkForce vpcSubnets.cluster-a-subnet;
     };
 
     deployment.route53 = lib.optionalAttrs (env != "production") {
@@ -45,30 +45,31 @@
 
     networking.firewall.allowedTCPPorts = [ 22 ];
 
-    awskeys = {
-      committee-secret = {
-        services = [ "disciplina-witness" ];
-        secretId = "${env}/disciplina/cluster";
-        key = "committee-secret";
-      };
-      faucet-key = {
-        services = [ "disciplina-faucet" ];
-        secretId = "${env}/disciplina/cluster";
-        key = "faucet-key";
-      };
-    };
+    # awskeys = {
+    #   committee-secret = {
+    #     services = [ "disciplina-witness" ];
+    #     secretId = "${env}/disciplina/cluster";
+    #     key = "committee-secret";
+    #   };
+    #   faucet-key = {
+    #     services = [ "disciplina-faucet" ];
+    #     secretId = "${env}/disciplina/cluster";
+    #     key = "faucet-key";
+    #   };
+    # };
     # aws secretsmanager get-secret-value --secret-id ${env}/disciplina/cluster | jq -r .SecretString
+    dscp.keydir = toString env;
   };
 
   resources = pkgs.lib.optionalAttrs (hostType == "ec2")
     (import ./cluster-resources.nix { inherit region env domain; });
 
-  balancer = import ./cluster/balancer.nix env domain;
+  balancer = import ./cluster/balancer.nix env domain "a";
 
-  witness0 = import ./cluster/witness.nix 0;
-  witness1 = import ./cluster/witness.nix 1;
-  witness2 = import ./cluster/witness.nix 2;
-  witness3 = import ./cluster/witness.nix 3;
+  witness0 = import ./cluster/witness.nix 0 "a";
+  witness1 = import ./cluster/witness.nix 1 "a";
+  witness2 = import ./cluster/witness.nix 2 "b";
+  witness3 = import ./cluster/witness.nix 3 "c";
 
-  educator = import ./cluster/educator.nix;
+  educator = import ./cluster/educator.nix "a";
 }

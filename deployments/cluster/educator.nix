@@ -1,4 +1,4 @@
-{ lib, name, nodes, pkgs, resources, ... }: with lib;
+r: { lib, name, nodes, pkgs, resources, ... }: with lib;
 
 let
   address = ip: ip + ":4010:4011";
@@ -11,6 +11,8 @@ in
   deployment.ec2.securityGroupIds = map (x: resources.ec2SecurityGroups."cluster-${x}-sg".name ) (
     [ "educator-api-private" "witness-public" ]
   );
+
+  deployment.ec2.subnetId = lib.mkForce resources.vpcSubnets."cluster-${r}-subnet";
 
   networking.firewall.allowedTCPPorts = [
     4010 4011   # Witness ZMQ API

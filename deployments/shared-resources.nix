@@ -1,5 +1,4 @@
 { region ? "eu-west-2", ... }:
-
 let lib = import ./lib.nix; inherit (lib) withVPC; in
 {
   resources = {
@@ -10,11 +9,12 @@ let lib = import ./lib.nix; inherit (lib) withVPC; in
       cidrBlock = "10.1.0.0/16";
     };
 
+    ec2KeyPairs.cluster-keypair = { inherit region; };
     ec2KeyPairs.deployer-keypair = { inherit region; };
     vpcInternetGateways.igw    = withVPC "shared-vpc" {};
     vpcRouteTables.route-table = withVPC "shared-vpc" {};
 
-    vpcSubnets.deployer-subnet = lib.publicSubnet "shared-vpc" "" "10.1.0.0/24";
+    vpcSubnets.deployer-subnet = lib.publicSubnet "shared-vpc" "${region}a" "10.1.40.0/24";
 
     vpcRouteTableAssociations = with lib.rta; {
       deployer-assoc = associate "deployer-subnet" "route-table";
