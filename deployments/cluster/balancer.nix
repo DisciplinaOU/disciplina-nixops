@@ -85,6 +85,7 @@ in
 
   services.disciplina = let
     config-key = "alpha";
+    getSecret = k: ''"$(aws secretsmanager get-secret-value --secret-id ${env}/disciplina/cluster | jq -r .SecretString)"'';
 
   in rec {
     enable = true;

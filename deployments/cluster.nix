@@ -23,7 +23,6 @@
       instanceType = lib.mkDefault "t2.medium";
       instanceProfile = "ReadDisciplinaSecrets";
       securityGroupIds = [ ec2SecurityGroups.cluster-ssh-public-sg.name ];
-      # subnetId = lib.mkForce vpcSubnets.cluster-a-subnet;
     };
 
     deployment.route53 = lib.optionalAttrs (env != "production") {
@@ -45,6 +44,12 @@
 
     networking.firewall.allowedTCPPorts = [ 22 ];
 
+    dscp.keydir = toString env;
+    dscp.keys = {
+      committee-secret = { user = "disciplina"; services = [ "disciplina-witness" ]; shared = false; };
+      faucet-key = { user = "disciplina"; services = [ "disciplina-faucet" ]; shared = false; };
+    };
+
     # awskeys = {
     #   committee-secret = {
     #     services = [ "disciplina-witness" ];
@@ -58,7 +63,6 @@
     #   };
     # };
     # aws secretsmanager get-secret-value --secret-id ${env}/disciplina/cluster | jq -r .SecretString
-    dscp.keydir = toString env;
   };
 
   resources = pkgs.lib.optionalAttrs (hostType == "ec2")
