@@ -127,5 +127,6 @@ in rec {
       rs-faucet = mkLBCname "faucet";
       rs-explorer = mkLBCname "explorer";
       rs-educator = mkLBCname "educator";
+      rs-validator = mkLBCname "validator";
     };
 }
