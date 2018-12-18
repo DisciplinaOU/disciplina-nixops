@@ -1,5 +1,6 @@
 { region ? "eu-west-2"
-, env ? builtins.getEnv "NIX_ENV" }:
+, env ? builtins.getEnv "NIX_ENV"
+, pkgs ? import ../pkgs.nix }:
 
 {
   network.description = "Disciplina - shared infra";

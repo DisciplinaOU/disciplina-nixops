@@ -37,17 +37,18 @@ rec {
     routeTableId = resources.vpcRouteTables.${table};
   };
 
-  # dns = zones: {
-  #   lib = (import ../pkgs.nix).lib;
-  #   lastN = count: list: lib.drop (lib.length list - count) list;
-  #   domainToZone = d: ((lib.concatStringsSep "." (lastN 2 (lib.splitString "." d))) + ".");
-  #   mkLBCname = d:
-  #     { lib, nodes, ... }:
-  #     {
-  #       domainName = "${d}.${domain}.";
-  #       recordValues = [ "witness.${domain}" ];
-  #       recordType = "CNAME";
-  #       zoneName = domainToZone domain;
-  #     };
-  # };
+  dns = domain: rec {
+    lib = (import ../pkgs.nix).lib;
+    lastN = count: list: lib.drop (lib.length list - count) list;
+    domainToZone = d: ((lib.concatStringsSep "." (lastN 2 (lib.splitString "." d))) + ".");
+    zone = domainToZone domain;
+    cname = from: to:
+      { lib, nodes, ... }:
+      {
+        domainName = "${from}.";
+        recordValues = [ to ];
+        recordType = "CNAME";
+        zoneName = zone;
+      };
+  };
 }
