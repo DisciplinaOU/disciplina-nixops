@@ -5,15 +5,19 @@ let
 in
   {
     resources = {
-      # There's this handy thing called `map`. Ever heard of it?
-      vpcSubnets.cluster-a-subnet = lib.publicSubnet "shared-vpc" "${region}a" "10.1.41.0/24";
-      vpcSubnets.cluster-b-subnet = lib.publicSubnet "shared-vpc" "${region}b" "10.1.42.0/24";
-      vpcSubnets.cluster-c-subnet = lib.publicSubnet "shared-vpc" "${region}c" "10.1.43.0/24";
+      ec2KeyPairs.cluster-keypair = { inherit region; };
+
+      witness-load-balancer-eip = { inherit region; vpc = true; };
+
+      vpcSubnets.deployer-subnet = publicSubnet "shared-vpc" "${region}a" "10.1.40.0/24";
+      vpcSubnets.a-subnet = lib.publicSubnet "shared-vpc" "${region}a" "10.1.41.0/24";
+      vpcSubnets.b-subnet = lib.publicSubnet "shared-vpc" "${region}b" "10.1.42.0/24";
+      vpcSubnets.c-subnet = lib.publicSubnet "shared-vpc" "${region}c" "10.1.43.0/24";
 
       vpcRouteTableAssociations = with lib.rta; {
-        cluster-a-assoc = associate "cluster-a-subnet" "route-table";
-        cluster-b-assoc = associate "cluster-b-subnet" "route-table";
-        cluster-c-assoc = associate "cluster-c-subnet" "route-table";
+        a-assoc = associate "a-subnet" "route-table";
+        b-assoc = associate "b-subnet" "route-table";
+        c-assoc = associate "c-subnet" "route-table";
       };
 
       ec2SecurityGroups = with sg "shared-vpc"; {

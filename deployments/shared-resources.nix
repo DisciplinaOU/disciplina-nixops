@@ -12,18 +12,14 @@ in
       cidrBlock = "10.1.0.0/16";
     };
 
-    ec2KeyPairs.cluster-keypair = { inherit region; };
     ec2KeyPairs.deployer-keypair = { inherit region; };
     vpcInternetGateways.igw    = withVPC "shared-vpc" {};
     vpcRouteTables.route-table = withVPC "shared-vpc" {};
-
-    vpcSubnets.deployer-subnet = publicSubnet "shared-vpc" "${region}a" "10.1.40.0/24";
+    vpcRoutes.igw-route = igwroute "route-table" "igw";
 
     vpcRouteTableAssociations = with rta; {
       deployer-assoc = associate "deployer-subnet" "route-table";
     };
-
-    vpcRoutes.igw-route = igwroute "route-table" "igw";
 
     ec2SecurityGroups = with sg "shared-vpc"; {
       http-public-sg        = public [ 80 443 ];

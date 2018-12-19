@@ -19,7 +19,7 @@ in
     [ "http-public" ]
   );
 
-  deployment.ec2.subnetId = lib.mkForce resources.vpcSubnets."cluster-${r}-subnet";
+  deployment.ec2.subnetId = lib.mkForce resources.vpcSubnets."${r}-subnet";
 
   boot.kernel.sysctl = {
     "net.core.somaxconn" = 4096;

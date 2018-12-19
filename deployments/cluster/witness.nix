@@ -16,7 +16,7 @@ in
       then [ "witness-private" ]
       else [ "witness-public" ])
   );
-  deployment.ec2.subnetId = lib.mkForce resources.vpcSubnets."cluster-${r}-subnet";
+  deployment.ec2.subnetId = lib.mkForce resources.vpcSubnets."${r}-subnet";
 
   networking.firewall.allowedTCPPorts = [
     4010 4011   # Witness ZMQ API
