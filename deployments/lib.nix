@@ -1,9 +1,12 @@
+{ region
+, vpcCidr }:
+
 rec {
   optionalCall = x: y: if builtins.isFunction x then x y else x;
   withVPC = vpc: resource: { resources, lib, ... }@arg:
-    (optionalCall resource (arg // { vpc = resources.vpc.${vpc}; })) // {
-      inherit (resources.vpc.${vpc}) region;
-      vpcId = resources.vpc.${vpc};
+    (optionalCall resource (arg // { vpc = vpc; })) // {
+      inherit region;
+      vpcId = vpc;
   };
   publicSubnet = vpc: zone: cidrBlock: withVPC vpc {
     inherit cidrBlock zone;
@@ -13,8 +16,8 @@ rec {
     public = ports: (withVPC vpc {
       rules = map (x: { toPort = x; fromPort = x; sourceIp = "0.0.0.0/0"; }) ports;
     });
-    private = ports: withVPC vpc ({ resources, lib, vpc, ... }: {
-      rules = map (x: { toPort = x; fromPort = x; sourceIp = vpc.cidrBlock; }) ports;
+    private = ports: (withVPC vpc {
+      rules = map (x: { toPort = x; fromPort = x; sourceIp = vpcCidr; }) ports;
     });
     fromSubnet = subnet: ports: withVPC vpc ({ resources, lib, vpc, ... }: {
       rules = map (x: {
@@ -25,16 +28,16 @@ rec {
     });
   };
   igwroute = table: gateway: { resources, ... }: {
-    inherit (resources.vpcRouteTables.${table}) region;
-    routeTableId = resources.vpcRouteTables.${table};
+    inherit region;
+    routeTableId = table;
     destinationCidrBlock = "0.0.0.0/0";
     gatewayId = resources.vpcInternetGateways.${gateway};
   };
 
   rta.associate = subnet: table: { resources, ... }: {
-    inherit (resources.vpcRouteTables.${table}) region;
+    inherit region;
     subnetId = resources.vpcSubnets.${subnet};
-    routeTableId = resources.vpcRouteTables.${table};
+    routeTableId = table;
   };
 
   dns = domain: rec {

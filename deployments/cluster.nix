@@ -2,13 +2,14 @@
 , env ? builtins.getEnv "NIX_ENV"
 , domain ? "see-readme.disciplina.site"
 , hostType ? "ec2"
-, pkgs ? import ../pkgs.nix }:
+, pkgs ? import ../pkgs.nix
+, ...}:
 
 {
   network.description = "Disciplina cluster";
 
   require = pkgs.lib.optionals (hostType == "ec2")
-    [ ./cluster-resources.nix ./shared-resources.nix ];
+    [ ./cluster-resources.nix ];
 
   defaults = { resources, lib, name, ... }: {
     imports = [ ../modules ];

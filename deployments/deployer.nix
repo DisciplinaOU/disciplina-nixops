@@ -1,6 +1,7 @@
 { region ? "eu-west-2"
 , env ? builtins.getEnv "NIX_ENV"
-, pkgs ? import ../pkgs.nix }:
+, pkgs ? import ../pkgs.nix
+, ...}:
 
 {
   network.description = "Disciplina - shared infra";
@@ -9,14 +10,16 @@
   disciplina-deployer = { config, lib, pkgs, resources, ... }: {
     deployment.targetEnv = "ec2";
 
-    deployment.ec2 = {
+    deployment.ec2 = with resources; {
       inherit region;
-      keyPair = resources.ec2KeyPairs.deployer-keypair;
+      keyPair = ec2KeyPairs.deployer-keypair;
 
       ebsInitialRootDiskSize = 256;
       instanceType = "t2.xlarge";
       instanceProfile = "ReadDisciplinaSecrets";
-      securityGroupIds = with resources.ec2SecurityGroups;
+      associatePublicIpAddress = true;
+      subnetId = vpcSubnets.deployer-subnet;
+      securityGroupIds = with ec2SecurityGroups;
         [ ssh-public-sg.name ];
     };
 
@@ -29,31 +32,32 @@
       # "witness.yaml".keyFile = ../keys/staging/witness.yaml;
     };
 
-    networking.hostName = "disciplina-deployer";
+    # networking.hostName = "disciplina-deployer";
+    documentation.enable = false;
 
-    nix = {
-      binaryCaches = [
-        "https://cache.nixos.org"
-        "https://disciplina.cachix.org"
-      ];
+    # nix = {
+    #   binaryCaches = [
+    #     "https://cache.nixos.org"
+    #     "https://disciplina.cachix.org"
+    #   ];
 
-      binaryCachePublicKeys = [
-        "disciplina.cachix.org-1:zDeIFV5cu22v04EUuRITz/rYxpBCGKY82x0mIyEYjxE="
-      ];
-    };
+    #   binaryCachePublicKeys = [
+    #     "disciplina.cachix.org-1:zDeIFV5cu22v04EUuRITz/rYxpBCGKY82x0mIyEYjxE="
+    #   ];
+    # };
 
     nixpkgs.overlays = [ (import ../pkgs) ];
 
-    services.buildkite-agent = {
-      #enable = true;
+    #services.buildkite-agent = {
+    #  #enable = true;
 
-      runtimePackages = with pkgs; [ bash gnutar nix-with-cachix ];
+    #  runtimePackages = with pkgs; [ bash gnutar nix-with-cachix ];
 
-      tags.hostname = config.networking.hostName;
-      tags.system = pkgs.system;
+    #  tags.hostname = config.networking.hostName;
+    #  tags.system = pkgs.system;
 
-      # tokenPath = "${config.awsKeys.buildkite-token.path}";
-    };
+    #  # tokenPath = "${config.awsKeys.buildkite-token.path}";
+    #};
 
     # awsKeys.buildkite-token = {
     #   services = [ "buildkite-agent" ];

@@ -20,6 +20,7 @@ in
   );
 
   deployment.ec2.subnetId = lib.mkForce resources.vpcSubnets."${r}-subnet";
+  deployment.ec2.elasticIPv4 = resources.elasticIPs.balancer-eip;
 
   boot.kernel.sysctl = {
     "net.core.somaxconn" = 4096;
