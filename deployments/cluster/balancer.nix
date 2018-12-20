@@ -1,6 +1,6 @@
 # TODO: add AWS ALB to NixOps and use that instead
 
-env: domain: r: { config, lib, pkgs, resources, ... }:
+env: domain: zone: { config, lib, pkgs, resources, ... }:
 
 let
   keys = config.dscp.keys;
@@ -19,7 +19,7 @@ in
     [ "http-public" ]
   );
 
-  deployment.ec2.subnetId = lib.mkForce resources.vpcSubnets."${r}-subnet";
+  deployment.ec2.subnetId = lib.mkForce resources.vpcSubnets."${zone}-subnet";
   deployment.ec2.elasticIPv4 = resources.elasticIPs.balancer-eip;
 
   boot.kernel.sysctl = {

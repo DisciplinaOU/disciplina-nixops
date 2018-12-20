@@ -1,4 +1,4 @@
-r: { lib, name, nodes, pkgs, resources, ... }: with lib;
+zone: { lib, name, nodes, pkgs, resources, ... }: with lib;
 
 let
   address = ip: ip + ":4010:4011";
@@ -12,7 +12,7 @@ in
     [ "educator-api-private" "witness-public" ]
   );
 
-  deployment.ec2.subnetId = lib.mkForce resources.vpcSubnets."${r}-subnet";
+  deployment.ec2.subnetId = lib.mkForce resources.vpcSubnets."${zone}-subnet";
 
   networking.firewall.allowedTCPPorts = [
     4010 4011   # Witness ZMQ API
