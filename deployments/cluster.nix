@@ -1,6 +1,6 @@
 { region ? "eu-west-2"
-, env ? builtins.getEnv "NIX_ENV"
-, domain ? "see-readme.disciplina.site"
+, env ? builtins.getEnv "DISCIPLINA_ENV"
+, domain ? "see-readme.dscp.serokell.review"
 , hostType ? "ec2"
 , pkgs ? import ../pkgs.nix
 , ...}:
