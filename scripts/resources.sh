@@ -1,6 +1,18 @@
 #!/usr/bin/env nix-shell
 #! nix-shell ../shell.nix -i bash
 # shellcheck shell=bash
+
+##
+# This file reads the resource IDs from one deployment and feeds them to
+# another deployment via `nixops set-args`.
+#
+# Currently, we pull these values from the `deployer` network:
+# - VPC ID
+# - VPC CIDR block
+# - Route Table ID
+#
+# These resources are necessary to link an independent deployment into the same
+# network.
 set -euo pipefail
 [[ -n ${DEBUG:-} ]] && set -x
 
