@@ -9,6 +9,7 @@ let
     explorer = "explorer.${domain}";
     educator = "educator.${domain}";
     witness = "witness.${domain}";
+    validator = "validator.${domain}";
   };
 in
 {
@@ -72,6 +73,10 @@ in
         "= /api/faucet/v1/".index = "index.html";
         "/api".proxyPass = "http://faucet";
         "/".root = pkgs.disciplina-faucet-frontend.override { faucetUrl = "//${uris.faucet}"; };
+      };
+
+      "${uris.validator}".locations = {
+        "/".root = pkgs.disciplina-validatorcv.override { witnessUrl = "//${uris.witness}"; };
       };
     };
   };

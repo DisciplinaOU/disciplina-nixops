@@ -4,7 +4,7 @@ set -exuo pipefail
 
 declare -a NIXOPS_OPTIONS DEPLOY_FIRST
 NIXOPS_OPTIONS=( -d disciplina --show-trace )
-DEPLOY_FIRST=( witness0 witness-load-balancer )
+DEPLOY_FIRST=( witness0 balancer )
 SLEEP='3m'
 
 nixops deploy "${NIXOPS_OPTIONS[@]}" --include "${DEPLOY_FIRST[@]}"

@@ -55,7 +55,7 @@
   resources = pkgs.lib.optionalAttrs (hostType == "ec2")
     (import ./cluster-resources.nix { inherit region env domain; });
 
-  witness-load-balancer = import ./cluster/witness-load-balancer.nix env domain;
+  balancer = import ./cluster/balancer.nix env domain;
 
   witness0 = import ./cluster/witness.nix env 0;
   witness1 = import ./cluster/witness.nix env 1;

@@ -34,7 +34,7 @@ in rec {
 
   elasticIPs = if production then
     {
-      witness-load-balancer-ip = mkIP;
+      balancer-ip = mkIP;
       witness1-ip = mkIP;
       witness2-ip = mkIP;
       witness3-ip = mkIP;
@@ -127,5 +127,6 @@ in rec {
       rs-faucet = mkLBCname "faucet";
       rs-explorer = mkLBCname "explorer";
       rs-educator = mkLBCname "educator";
+      rs-validator = mkLBCname "validator";
     };
 }
