@@ -34,12 +34,18 @@ in
     type = "witness";
 
     config."${config-key}".witness = rec {
-      appDir = "/var/lib/disciplina-${type}";
-        db = {
-          path = "${appDir}/witness.db";
-          clean = false;
-        };
-      api.addr = "0.0.0.0:4030";
+      appDir.param = {
+        paramType = "specific";
+        specific.path = "/var/lib/disciplina-${type}";
+      };
+      db = {
+        path = "${appDir}/witness.db";
+        clean = false;
+      };
+      api.maybe = {
+        maybeType = "just";
+        just.addr = "0.0.0.0:4030";
+      };
     };
 
     args = let
