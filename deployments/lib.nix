@@ -1,5 +1,5 @@
 { region
-, vpcCidr }:
+, vpcCidr ? null }:
 
 ##
 # Helper functions for AWS resource declaration.
@@ -15,7 +15,7 @@ rec {
   withVPC = vpc: resource: { resources, lib, ... }@arg:
     (optionalCall resource (arg // { vpc = vpc; })) // {
       inherit region;
-      vpcId = vpc;
+      vpcId = resources.vpc."${vpc}" or vpc;
   };
 
   # Declare a public subnet
@@ -51,7 +51,7 @@ rec {
   # Declare an Internet Gateway Route Table Association
   igwroute = table: gateway: { resources, ... }: {
     inherit region;
-    routeTableId = table;
+    routeTableId = resources.vpcRouteTables."${table}" or table;
     destinationCidrBlock = "0.0.0.0/0";
     gatewayId = resources.vpcInternetGateways.${gateway};
   };
@@ -60,7 +60,7 @@ rec {
   rta.associate = subnet: table: { resources, ... }: {
     inherit region;
     subnetId = resources.vpcSubnets.${subnet};
-    routeTableId = table;
+    routeTableId = resources.vpcRouteTables."${table}" or table;
   };
 
   # DSL to declare DNS records
