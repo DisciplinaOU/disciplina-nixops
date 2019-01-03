@@ -6,7 +6,7 @@
 , ...}:
 
 {
-  network.description = "Disciplina cluster";
+  network.description = "Disciplina cluster ${domain}";
 
   require = pkgs.lib.optionals (hostType == "ec2")
     [ ./cluster-resources.nix ];
