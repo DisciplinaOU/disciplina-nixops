@@ -18,7 +18,8 @@ set -euo pipefail
 
 from=${1:-staging}
 to=${2:-disciplina}
-mode=${3:-local}
+do=${3:-disciplina}
+mode=${4:-local}
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 SFILE="$DIR/../state/deployer.nixops"
@@ -46,7 +47,7 @@ if [[ $do == write ]]; then
         nixops scp -s "$SFILE" -d "$from" builder route_table_id  /var/lib/nixops/route_table_id
     fi
 
-elif [[ $do == write ]]; then
+elif [[ $do == read ]]; then
     # Read existing IDs from files and write to deployment
     nixops set-args -d "$to" --argstr vpcId        "$(cat /var/lib/nixops/shared_vpc_id)"
     nixops set-args -d "$to" --argstr vpcCidr      "$(cat /var/lib/nixops/shared_vpc_cidr)"
