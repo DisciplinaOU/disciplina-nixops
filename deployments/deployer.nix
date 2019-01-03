@@ -63,6 +63,43 @@
     #   services = [ "buildkite-agent" ];
     #   secretId = "${env}/disciplina/deployment";
     # };
+
+    users.extraGroups.nixops = {};
+    users.users.nixops = {
+      isSystemUser = true;
+      group = "nixops";
+      # keys: read nixops ephemeral keys
+      # users: read nix files from user homes
+      extraGroups = [ "keys" "users" ];
+      home = "/var/lib/nixops";
+      createHome = true;
+    };
+
+    security.sudo = {
+      extraRules = [
+        {
+          ##
+          # Allow members of the `wheel` group, as well as user `buildkite-agent`
+          # to execute `nixops deploy` as the `nixops` user.
+          commands = [
+            { command = "${pkgs.nixops-git}/bin/nixops deploy *";
+            options = [ "SETENV" "NOPASSWD" ]; }
+            { command = "${pkgs.nixops-git}/bin/nixops info";
+            options = [ "SETENV" "NOPASSWD" ]; }
+            { command = "${pkgs.nixops-git}/bin/nixops list";
+            options = [ "SETENV" "NOPASSWD" ]; }
+            { command = "${pkgs.nixops-git}/bin/nixops check";
+            options = [ "SETENV" "NOPASSWD" ]; }
+          ];
+          groups = [ "wheel" "nixops" ];
+          # users = [ "buildkite-agent" ];
+          runAs = "nixops";
+        }
+      ];
+      extraConfig = ''
+        Defaults env_keep+=NIX_PATH
+      '';
+    };
   };
 
 }
