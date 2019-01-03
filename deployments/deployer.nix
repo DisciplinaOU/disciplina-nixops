@@ -35,16 +35,16 @@
     # networking.hostName = "disciplina-deployer";
     documentation.enable = false;
 
-    # nix = {
-    #   binaryCaches = [
-    #     "https://cache.nixos.org"
-    #     "https://disciplina.cachix.org"
-    #   ];
+    nix = {
+      binaryCaches = [
+        "https://cache.nixos.org"
+        "https://disciplina.cachix.org"
+      ];
 
-    #   binaryCachePublicKeys = [
-    #     "disciplina.cachix.org-1:zDeIFV5cu22v04EUuRITz/rYxpBCGKY82x0mIyEYjxE="
-    #   ];
-    # };
+      binaryCachePublicKeys = [
+        "disciplina.cachix.org-1:zDeIFV5cu22v04EUuRITz/rYxpBCGKY82x0mIyEYjxE="
+      ];
+    };
 
     nixpkgs.overlays = [ (import ../pkgs) ];
 
