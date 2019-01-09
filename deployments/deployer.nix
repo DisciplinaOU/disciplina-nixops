@@ -4,6 +4,7 @@
 , ...}:
 
 let
+  inherit (pkgs) lib;
   wheel = [ "chris" "kirelagin" "lars" "yorick" ];
   expandUser = _name: keys: {
     extraGroups = (lib.optional (builtins.elem _name wheel) "wheel") ++ [ "systemd-journal" ];
@@ -11,7 +12,7 @@ let
     openssh.authorizedKeys.keys = keys;
   };
 
-  nixopsWrapper = writeShellScriptBin "nixops" ''
+  nixopsWrapper = pkgs.writeShellScriptBin "nixops" ''
     # Download AWS credentials using the serokell-nixops instance profile and
     # forward them to nixops
     key_json="$(${pkgs.curl}/bin/curl \
@@ -29,7 +30,7 @@ in {
   network.description = "Disciplina - shared infra";
   require = [ ./shared-resources.nix ];
 
-  disciplina-deployer = { config, lib, pkgs, resources, ... }: {
+  disciplina-deployer = { config, resources, ... }: {
     deployment.targetEnv = "ec2";
 
     deployment.ec2 = with resources; {
@@ -70,7 +71,7 @@ in {
       ];
     };
 
-    nixpkgs.overlays = [ (import ../pkgs) ];
+    nixpkgs.pkgs = pkgs;
 
     #services.buildkite-agent = {
     #  #enable = true;
