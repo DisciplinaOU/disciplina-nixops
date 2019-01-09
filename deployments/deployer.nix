@@ -4,6 +4,13 @@
 , ...}:
 
 let
+  wheel = [ "chris" "kirelagin" "lars" "yorick" ];
+  expandUser = _name: keys: {
+    extraGroups = (lib.optional (builtins.elem _name wheel) "wheel") ++ [ "systemd-journal" ];
+    isNormalUser = true;
+    openssh.authorizedKeys.keys = keys;
+  };
+
   nixopsWrapper = writeShellScriptBin "nixops" ''
     # Download AWS credentials using the serokell-nixops instance profile and
     # forward them to nixops
@@ -82,15 +89,18 @@ in {
     # };
 
     users.extraGroups.nixops = {};
-    users.users.nixops = {
-      isSystemUser = true;
-      group = "nixops";
-      # keys: read nixops ephemeral keys
-      # users: read nix files from user homes
-      extraGroups = [ "keys" "users" ];
-      home = "/var/lib/nixops";
-      createHome = true;
-    };
+    users.mutableUsers = false;
+    users.users = {
+      nixops = {
+        isSystemUser = true;
+        group = "nixops";
+        # keys: read nixops ephemeral keys
+        # users: read nix files from user homes
+        extraGroups = [ "keys" "users" ];
+        home = "/var/lib/nixops";
+        createHome = true;
+      };
+    } // lib.mapAttrs expandUser (import ./ssh-keys.nix);
 
     security.sudo = {
       extraRules = [
@@ -116,6 +126,8 @@ in {
       extraConfig = ''
         Defaults env_keep+=NIX_PATH
       '';
+
+      wheelNeedsPassword = false;
     };
   };
 
