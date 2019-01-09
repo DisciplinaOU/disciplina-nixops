@@ -3,7 +3,22 @@
 , pkgs ? import ../pkgs.nix
 , ...}:
 
-{
+let
+  nixopsWrapper = writeShellScriptBin "nixops" ''
+    # Download AWS credentials using the serokell-nixops instance profile and
+    # forward them to nixops
+    key_json="$(${pkgs.curl}/bin/curl \
+      "http://169.254.169.254/latest/meta-data/iam/security-credentials/serokell-nixops")"
+
+    cat > "/var/lib/nixops/.ec2-keys" <<EOF
+    aws_access_key_id=$(echo "$key_json" | ${pkgs.jq}/bin/jq -r .AccessKeyId)
+    aws_secret_access_key=$(echo "$key_json" | ${pkgs.jq}/bin/jq -r .SecretAccessKey)
+    EOF
+
+    exec ${pkgs.nixops}/bin/nixops "$@"
+  '';
+
+in {
   network.description = "Disciplina - shared infra";
   require = [ ./shared-resources.nix ];
 
@@ -16,7 +31,7 @@
 
       ebsInitialRootDiskSize = 256;
       instanceType = "t2.xlarge";
-      instanceProfile = "ReadDisciplinaSecrets";
+      instanceProfile = "serokell-nixops";
       associatePublicIpAddress = true;
       subnetId = vpcSubnets.deployer-subnet;
       securityGroupIds = with ec2SecurityGroups;
@@ -34,6 +49,8 @@
 
     # networking.hostName = "disciplina-deployer";
     documentation.enable = false;
+
+    environment.systemPackages = [ nixopsWrapper ];
 
     nix = {
       binaryCaches = [
@@ -82,13 +99,13 @@
           # Allow members of the `wheel` group, as well as user `buildkite-agent`
           # to execute `nixops deploy` as the `nixops` user.
           commands = [
-            { command = "${pkgs.nixops-git}/bin/nixops deploy *";
+            { command = "${nixopsWrapper}/bin/nixops deploy *";
             options = [ "SETENV" "NOPASSWD" ]; }
-            { command = "${pkgs.nixops-git}/bin/nixops info";
+            { command = "${nixopsWrapper}/bin/nixops info";
             options = [ "SETENV" "NOPASSWD" ]; }
-            { command = "${pkgs.nixops-git}/bin/nixops list";
+            { command = "${nixopsWrapper}/bin/nixops list";
             options = [ "SETENV" "NOPASSWD" ]; }
-            { command = "${pkgs.nixops-git}/bin/nixops check";
+            { command = "${nixopsWrapper}/bin/nixops check";
             options = [ "SETENV" "NOPASSWD" ]; }
           ];
           groups = [ "wheel" "nixops" ];
