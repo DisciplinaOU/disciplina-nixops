@@ -1,4 +1,4 @@
-{ region ? "eu-west-2"
+{ region ? "eu-central-1"
 , domain
 , vpcId ? null
 , vpcCidr ? null

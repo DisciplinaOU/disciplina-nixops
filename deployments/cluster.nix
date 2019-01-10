@@ -1,4 +1,4 @@
-{ region ? "eu-west-2"
+{ region ? "eu-central-1"
 , env ? builtins.getEnv "DISCIPLINA_ENV"
 , domain ? "see-readme.dscp.serokell.review"
 , hostType ? "ec2"
