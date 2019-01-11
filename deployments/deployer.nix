@@ -17,7 +17,7 @@ let
 
     # Download AWS credentials using the serokell-nixops instance profile and
     # forward them to nixops
-    key_json="$(${pkgs.curl}/bin/curl --silent --show-error \
+    key_json="$(sudo ${pkgs.curl}/bin/curl --silent --show-error \
       "http://169.254.169.254/latest/meta-data/iam/security-credentials/serokell-nixops")"
 
     cat > "/var/lib/nixops/.ec2-keys" <<EOF
@@ -131,6 +131,14 @@ in {
           groups = [ "wheel" "nixops" ];
           # users = [ "buildkite-agent" ];
           runAs = "nixops";
+        }
+        {
+          commands = [
+            { command = "${pkgs.curl}/bin/curl --silent --show-error \"http://169.254.169.254/latest/meta-data/iam/security-credentials/serokell-nixops\"";
+              options = [ "NOSETENV" "NOPASSWD" ]; }
+          ];
+          runAs = "root";
+          users = [ "nixops" ];
         }
       ];
       extraConfig = ''
