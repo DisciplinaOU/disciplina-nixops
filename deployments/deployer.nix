@@ -12,7 +12,12 @@ let
     openssh.authorizedKeys.keys = keys;
   };
 
-  getNixopsSecurityCredentials = "${pkgs.curl}/bin/curl --silent --show-error \"http://169.254.169.254/latest/meta-data/iam/security-credentials/serokell-nixops\"";
+  getNixopsSecurityCredentials = pkgs.writeScript "getNixopsSecurityCredentials" ''
+    #!${pkgs.bash}/bin/bash
+    ${pkgs.curl}/bin/curl --silent --show-error \
+      http://169.254.169.254/latest/meta-data/iam/security-credentials/serokell-nixops
+  '';
+
 
   nixopsWrapper = pkgs.writeShellScriptBin "nixops" ''
     [ "$(whoami)" = "nixops" ] || ( echo Please run with sudo -u nixops; exit 1 )
@@ -69,6 +74,14 @@ in {
     documentation.enable = false;
 
     environment.systemPackages = [ nixopsWrapper ];
+
+    # limit access to amazon roles and keys to root
+    networking.firewall.extraCommands = ''
+      iptables -A OUTPUT -m owner -p tcp -d 169.254.169.254 ! --uid-owner root -j nixos-fw-log-refuse
+    '';
+    networking.firewall.extraStopCommands = ''
+      iptables -D OUTPUT -m owner -p tcp -d 169.254.169.254 ! --uid-owner root -j nixos-fw-log-refuse || true
+    '';
 
     nix = {
       binaryCaches = [
@@ -135,7 +148,7 @@ in {
         }
         {
           commands = [
-            { command = getNixopsSecurityCredentials;
+            { command = toString getNixopsSecurityCredentials;
               options = [ "NOSETENV" "NOPASSWD" ]; }
           ];
           runAs = "root";
