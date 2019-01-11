@@ -12,13 +12,14 @@ let
     openssh.authorizedKeys.keys = keys;
   };
 
+  getNixopsSecurityCredentials = "${pkgs.curl}/bin/curl --silent --show-error \"http://169.254.169.254/latest/meta-data/iam/security-credentials/serokell-nixops\"";
+
   nixopsWrapper = pkgs.writeShellScriptBin "nixops" ''
     [ "$(whoami)" = "nixops" ] || ( echo Please run with sudo -u nixops; exit 1 )
 
     # Download AWS credentials using the serokell-nixops instance profile and
     # forward them to nixops
-    key_json="$(${pkgs.curl}/bin/curl --silent --show-error \
-      "http://169.254.169.254/latest/meta-data/iam/security-credentials/serokell-nixops")"
+    key_json="$(sudo ${getNixopsSecurityCredentials})"
 
     cat > "/var/lib/nixops/.ec2-keys" <<EOF
     aws_access_key_id=$(echo "$key_json" | ${pkgs.jq}/bin/jq -r .AccessKeyId)
@@ -131,6 +132,14 @@ in {
           groups = [ "wheel" "nixops" ];
           # users = [ "buildkite-agent" ];
           runAs = "nixops";
+        }
+        {
+          commands = [
+            { command = getNixopsSecurityCredentials;
+              options = [ "NOSETENV" "NOPASSWD" ]; }
+          ];
+          runAs = "root";
+          users = [ "nixops" ];
         }
       ];
       extraConfig = ''
