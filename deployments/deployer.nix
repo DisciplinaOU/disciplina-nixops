@@ -20,15 +20,18 @@ let
 
 
   nixopsWrapper = pkgs.writeShellScriptBin "nixops" ''
-    [ "$(whoami)" = "nixops" ] || ( echo Please run with sudo -u nixops; exit 1 )
+    [ "$(whoami)" = "nixops" ] || { echo Please run with sudo -u nixops; exit 1; }
 
     # Download AWS credentials using the serokell-nixops instance profile and
     # forward them to nixops
     key_json="$(sudo ${getNixopsSecurityCredentials})"
 
-    cat > "/var/lib/nixops/.ec2-keys" <<EOF
+    mkdir -p /var/lib/nixops/.aws
+    cat > /var/lib/nixops/.aws/credentials <<EOF
+    [default]
     aws_access_key_id=$(echo "$key_json" | ${pkgs.jq}/bin/jq -r .AccessKeyId)
     aws_secret_access_key=$(echo "$key_json" | ${pkgs.jq}/bin/jq -r .SecretAccessKey)
+    aws_session_token=$(echo "$key_json" | ${pkgs.jq}/bin/jq -r .Token)
     EOF
 
     ${pkgs.nixops}/bin/nixops "$@"
