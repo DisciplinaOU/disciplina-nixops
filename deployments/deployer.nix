@@ -94,7 +94,7 @@ in {
     services.buildkite-agent = {
       #enable = true;
 
-      runtimePackages = with pkgs; [ bash gnutar nix-with-cachix ];
+      runtimePackages = with pkgs; [ bash gnutar nix-with-cachix jq ];
 
       tags.hostname = config.networking.hostName;
       tags.system = pkgs.system;
