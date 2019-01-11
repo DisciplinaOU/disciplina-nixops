@@ -15,7 +15,7 @@ stdenv.mkDerivation {
   AWS_ACCESS_KEY_ID = "default";
   AWS_SHARED_CREDENTIALS_FILE = "${toString ./.}/keys/${env}/aws-credentials";
 
-  DISCPLINA_ENV = env; # Fancy way to share this variable with nixops
+  DISCIPLINA_ENV = env; # Fancy way to share this variable with nixops
   NIX_PATH = lib.concatStringsSep ":" [
     "nixpkgs=${pkgs.path}"
     "disciplina=https://github.com/DisciplinaOU/disciplina/archive/master.tar.gz"
