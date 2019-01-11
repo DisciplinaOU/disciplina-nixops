@@ -3,7 +3,7 @@
 nixops.overrideAttrs (super: {
   src = fetchGit {
     url = https://github.com/serokell/nixops;
-    rev = "b2518d6b6656e36b4a571e41ee854ab325f4b86f";
+    rev = "4f9e4d2d574a832b4e81a7c95d9c9cb1c7b0dffb";
   };
 
   postPatch = ''
