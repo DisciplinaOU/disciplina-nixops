@@ -31,6 +31,14 @@
       instanceProfile = "ReadDisciplinaSecrets";
       securityGroupIds = [ ec2SecurityGroups.cluster-ssh-public-sg.name ];
     };
+    
+    # limit access to amazon roles and keys to root
+    networking.firewall.extraCommands = ''
+      iptables -A OUTPUT -m owner -p tcp -d 169.254.169.254 ! --uid-owner root -j nixos-fw-log-refuse
+    '';
+    networking.firewall.extraStopCommands = ''
+      iptables -D OUTPUT -m owner -p tcp -d 169.254.169.254 ! --uid-owner root -j nixos-fw-log-refuse || true
+    '';
 
     deployment.route53 = lib.optionalAttrs (env != "production") {
       usePublicDNSName = true;
