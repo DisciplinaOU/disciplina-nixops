@@ -17,8 +17,11 @@ let
     ${pkgs.curl}/bin/curl --silent --show-error \
       http://169.254.169.254/latest/meta-data/iam/security-credentials/serokell-nixops
   '';
-
-
+  getBuildkiteSecrets = pkgs.writeScript "getBuildkiteSecrets" ''
+    #!${pkgs.bash}/bin/bash
+    "${pkgs.awscli}/bin/aws secretsmanager get-secret-value --secret-id production/disciplina/buildkite --region eu-central-1 \
+    | ${pkgs.jq}/bin/jq -r .SecretString
+  '';
   nixopsWrapper = pkgs.writeShellScriptBin "nixops" ''
     [ "$(whoami)" = "nixops" ] || ( echo Please run with sudo -u nixops; exit 1 )
 
@@ -97,16 +100,29 @@ in {
 
     nixpkgs.pkgs = pkgs;
 
-    #services.buildkite-agent = {
-    #  #enable = true;
+    services.buildkite-agent = {
+      #enable = true;
 
-    #  runtimePackages = with pkgs; [ bash gnutar nix-with-cachix ];
+      runtimePackages = with pkgs; [ bash gnutar nix-with-cachix ];
 
-    #  tags.hostname = config.networking.hostName;
-    #  tags.system = pkgs.system;
+      tags.hostname = config.networking.hostName;
+      tags.system = pkgs.system;
 
-    #  # tokenPath = "${config.awsKeys.buildkite-token.path}";
-    #};
+      # tokenPath is cat'd into the buildkite config file, as root
+      # https://github.com/serokell/nixpkgs/blob/e68ada3bfc8142ca94526cd5f39fcc58e57b85a4/nixos/modules/services/continuous-integration/buildkite-agents.nix#L258
+      # token="$(cat ${toString cfg.tokenPath})"
+      # but there is a check that it is a path (starts with a /)
+      # long-term, we should probably add a tokenCommand
+      tokenPath = "/dev/null <(${getBuildkiteSecrets} | jq -r .AgentToken')";
+      # :)
+
+      hooks.environment = ''
+        secrets="$(sudo ${getBuildkiteSecrets})"
+        export BUILDKITE_API_TOKEN=$(echo "$secrets" | jq -r .APIAccessToken)
+        export CACHIX_SIGNING_KEY=$(echo "$secrets" | jq -r .CachixSigningKey)
+        unset secrets
+      '';
+    };
 
     # awsKeys.buildkite-token = {
     #   services = [ "buildkite-agent" ];
@@ -154,6 +170,14 @@ in {
           ];
           runAs = "root";
           users = [ "nixops" ];
+        }
+        {
+          commands = [
+            { command = toString getBuildkiteSecrets;
+              options = [ "NOSETENV" "NOPASSWD" ]; }
+          ];
+          runAs = "root";
+          users = [ "buildkite-agent" ];
         }
       ];
       extraConfig = ''
