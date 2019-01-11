@@ -35,9 +35,10 @@ let
     rv=$?
 
     cd /var/lib/nixops/.nixops
-    [ -e .git ] || git init -q
-    git add .
-    git commit -qm "nixops $*"
+    [ -e .git ] || ${pkgs.git}/bin/git init -q
+    ${pkgs.git}/bin/git add .
+    ${pkgs.git}/bin/git diff-index --quiet HEAD || \
+      ${pkgs.git}/bin/git -c user.name=nixops -c user.email= commit -qm "nixops $*"
     exit $rv
   '';
 
