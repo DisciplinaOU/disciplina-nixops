@@ -22,7 +22,12 @@ let
     "${pkgs.awscli}/bin/aws secretsmanager get-secret-value --secret-id production/disciplina/buildkite --region eu-central-1 \
     | ${pkgs.jq}/bin/jq -r .SecretString
   '';
-  nixopsWrapper = pkgs.writeShellScriptBin "nixops" ''
+  nixopsWrapper =
+  let
+    git = "${pkgs.git}/bin/git -c user.name=nixops -c user.email=";
+  in pkgs.writeShellScriptBin "nixops" ''
+    set -euo pipefail
+
     [ "$(whoami)" = "nixops" ] || { echo Please run with sudo -u nixops; exit 1; }
 
     # Download AWS credentials using the serokell-nixops instance profile and
@@ -37,14 +42,18 @@ let
     aws_session_token=$(echo "$key_json" | ${pkgs.jq}/bin/jq -r .Token)
     EOF
 
-    ${pkgs.nixops}/bin/nixops "$@"
+    AWS_ACCESS_KEY_ID=default ${pkgs.nixops}/bin/nixops "$@"
     rv=$?
 
     cd /var/lib/nixops/.nixops
-    [ -e .git ] || ${pkgs.git}/bin/git init -q
-    ${pkgs.git}/bin/git add .
-    ${pkgs.git}/bin/git diff-index --quiet HEAD || \
-      ${pkgs.git}/bin/git -c user.name=nixops -c user.email= commit -qm "nixops $*"
+    [ -e .git ] || {
+      ${git} init -q
+      ${git} commit --allow-empty -qm "initial commit"
+    }
+
+    ${git} add .
+    ${git} diff-index --quiet HEAD || \
+      ${git} commit -qm "nixops $*"
     exit $rv
   '';
 
@@ -71,7 +80,7 @@ in {
     # networking.hostName = "disciplina-deployer";
     documentation.enable = false;
 
-    environment.systemPackages = [ nixopsWrapper ];
+    environment.systemPackages = with pkgs; [ git nixopsWrapper ];
 
     # limit access to amazon roles and keys to root
     networking.firewall.extraCommands = ''
@@ -90,6 +99,11 @@ in {
       binaryCachePublicKeys = [
         "disciplina.cachix.org-1:zDeIFV5cu22v04EUuRITz/rYxpBCGKY82x0mIyEYjxE="
       ];
+
+      nixPath = [
+        "nixpkgs=${toString pkgs.path}"
+        "/nix/var/nix/profiles/per-user/root/channels"
+      ];
     };
 
     nixpkgs.pkgs = pkgs;
@@ -101,6 +115,7 @@ in {
 
       tags.hostname = config.networking.hostName;
       tags.system = pkgs.system;
+      tags.deploy = true;
 
       # tokenPath is cat'd into the buildkite config file, as root
       # https://github.com/serokell/nixpkgs/blob/e68ada3bfc8142ca94526cd5f39fcc58e57b85a4/nixos/modules/services/continuous-integration/buildkite-agents.nix#L258
@@ -117,11 +132,6 @@ in {
         unset secrets
       '';
     };
-
-    # awsKeys.buildkite-token = {
-    #   services = [ "buildkite-agent" ];
-    #   secretId = "${env}/disciplina/deployment";
-    # };
 
     users.extraGroups.nixops = {};
     users.mutableUsers = false;
