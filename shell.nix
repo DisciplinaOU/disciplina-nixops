@@ -10,6 +10,7 @@ stdenv.mkDerivation {
     git-crypt
     nixops
     sqlite
+    jq
   ];
 
   AWS_ACCESS_KEY_ID = "default";
