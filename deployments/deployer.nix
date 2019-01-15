@@ -17,11 +17,14 @@ let
     ${pkgs.curl}/bin/curl --silent --show-error \
       http://169.254.169.254/latest/meta-data/iam/security-credentials/serokell-nixops
   '';
+
+  buildkiteAgentName = "default";
   getBuildkiteSecrets = pkgs.writeScript "getBuildkiteSecrets" ''
     #!${pkgs.bash}/bin/bash
     ${pkgs.awscli}/bin/aws secretsmanager get-secret-value --secret-id production/disciplina/buildkite --region eu-central-1 \
       | ${pkgs.jq}/bin/jq -r .SecretString
   '';
+
   nixopsWrapper =
   let
     git = "${pkgs.git}/bin/git -c user.name=nixops -c user.email=";
@@ -108,7 +111,7 @@ in {
 
     nixpkgs.pkgs = pkgs;
 
-    services.buildkite-agents."default" = {
+    services.buildkite-agents.${buildkiteAgentName} = {
       enable = true;
 
       runtimePackages = with pkgs; [ bash gnutar nix-with-cachix jq ];
@@ -126,7 +129,7 @@ in {
       # :)
 
       hooks.environment = ''
-        secrets="$(sudo ${getBuildkiteSecrets})"
+        secrets="$(/run/wrappers/bin/sudo ${getBuildkiteSecrets})"
         export BUILDKITE_API_TOKEN=$(echo "$secrets" | jq -r .APIAccessToken)
         export CACHIX_SIGNING_KEY=$(echo "$secrets" | jq -r .CachixSigningKey)
         unset secrets
@@ -181,7 +184,7 @@ in {
               options = [ "NOSETENV" "NOPASSWD" ]; }
           ];
           runAs = "root";
-          users = [ "buildkite-agent" ];
+          users = [ "buildkite-agent-${buildkiteAgentName}" ];
         }
       ];
       extraConfig = ''
