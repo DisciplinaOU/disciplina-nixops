@@ -19,8 +19,8 @@ let
   '';
   getBuildkiteSecrets = pkgs.writeScript "getBuildkiteSecrets" ''
     #!${pkgs.bash}/bin/bash
-    "${pkgs.awscli}/bin/aws secretsmanager get-secret-value --secret-id production/disciplina/buildkite --region eu-central-1 \
-    | ${pkgs.jq}/bin/jq -r .SecretString
+    ${pkgs.awscli}/bin/aws secretsmanager get-secret-value --secret-id production/disciplina/buildkite --region eu-central-1 \
+      | ${pkgs.jq}/bin/jq -r .SecretString
   '';
   nixopsWrapper =
   let
@@ -101,28 +101,28 @@ in {
       ];
 
       nixPath = [
-        "nixpkgs=${toString pkgs.path}"
+        "nixpkgs=${pkgs.path}"
         "/nix/var/nix/profiles/per-user/root/channels"
       ];
     };
 
     nixpkgs.pkgs = pkgs;
 
-    services.buildkite-agent = {
-      #enable = true;
+    services.buildkite-agents."default" = {
+      enable = true;
 
       runtimePackages = with pkgs; [ bash gnutar nix-with-cachix jq ];
 
       tags.hostname = config.networking.hostName;
       tags.system = pkgs.system;
-      tags.deploy = true;
+      tags.deploy = "true";
 
       # tokenPath is cat'd into the buildkite config file, as root
       # https://github.com/serokell/nixpkgs/blob/e68ada3bfc8142ca94526cd5f39fcc58e57b85a4/nixos/modules/services/continuous-integration/buildkite-agents.nix#L258
       # token="$(cat ${toString cfg.tokenPath})"
       # but there is a check that it is a path (starts with a /)
       # long-term, we should probably add a tokenCommand
-      tokenPath = "/dev/null <(${getBuildkiteSecrets} | jq -r .AgentToken')";
+      tokenPath = "/dev/null <(${getBuildkiteSecrets} | jq -r .AgentToken)";
       # :)
 
       hooks.environment = ''
