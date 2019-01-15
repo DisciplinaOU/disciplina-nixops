@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 if [ -z "$IN_NIX_SHELL" ]; then
   echo >&2 "Please, run this script from inside nix-shell."
