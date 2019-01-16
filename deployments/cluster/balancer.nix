@@ -3,7 +3,7 @@
 env: domain: zone: { config, lib, pkgs, resources, ... }:
 
 let
-  keys = config.dscp.keys;
+  keys = config.awskeys;
   uris = {
     faucet = "faucet.${domain}";
     explorer = "explorer.${domain}";

@@ -1,7 +1,7 @@
 n: zone: { lib, name, nodes, pkgs, resources, config, ... }: with lib;
 
 let
-  keys = config.dscp.keys;
+  keys = config.awskeys;
   address = ip: ip + ":4010:4011";
   hasWitnessTag = node: elem "witness" node.config.system.nixos.tags;
   isInternal = n == 0;

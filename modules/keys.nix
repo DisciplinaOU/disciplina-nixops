@@ -85,7 +85,7 @@
           };
 
           __toString = mkOption {
-            default = self: path;
+            default = self: self.path;
             readOnly = true;
           };
         };
