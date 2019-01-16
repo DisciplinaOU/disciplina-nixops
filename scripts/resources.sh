@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#! nix-shell ../shell.nix -i bash
+#! nix-shell -i bash -p bash jq
 # shellcheck shell=bash
 
 ##
@@ -13,18 +13,19 @@
 #
 # These resources are necessary to link an independent deployment into the same
 # network.
+#
+# E.g. to copy resources from the "deployer" to the "staging" cluster:
+# $ ./resources.sh deployer staging
+
 set -euo pipefail
 [[ -n ${DEBUG:-} ]] && set -x
 
 from=${1:-staging}
 to=${2:-disciplina}
-do=${3:-disciplina}
+do=${3:-write}
 mode=${4:-local}
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-SFILE="$DIR/../state/deployer.nixops"
-
-json="$(nixops export -s "$SFILE" -d "$from")"
+json="$(nixops export -d "$from")"
 shared_vpc_id=$(echo "$json"   | jq -r ".[].resources[\"shared-vpc\"].vpcId")
 shared_vpc_cidr=$(echo "$json" | jq -r ".[].resources[\"shared-vpc\"].cidrBlock")
 route_table_id=$(echo "$json"  | jq -r ".[].resources[\"route-table\"].routeTableId")
@@ -42,9 +43,9 @@ if [[ $do == write ]]; then
         echo "$shared_vpc_cidr" >| shared_vpc_cidr
         echo "$route_table_id" >| route_table_id
 
-        nixops scp -s "$SFILE" -d "$from" builder shared_vpc_id   /var/lib/nixops/shared_vpc_id
-        nixops scp -s "$SFILE" -d "$from" builder shared_vpc_cidr /var/lib/nixops/shared_vpc_cidr
-        nixops scp -s "$SFILE" -d "$from" builder route_table_id  /var/lib/nixops/route_table_id
+        nixops scp -d "$from" builder shared_vpc_id   /var/lib/nixops/shared_vpc_id
+        nixops scp -d "$from" builder shared_vpc_cidr /var/lib/nixops/shared_vpc_cidr
+        nixops scp -d "$from" builder route_table_id  /var/lib/nixops/route_table_id
     fi
 
 elif [[ $do == read ]]; then
