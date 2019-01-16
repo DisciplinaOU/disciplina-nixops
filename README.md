@@ -113,6 +113,9 @@ Some terminology first:
 
 #### IMPORTANT
 
+If you want to avoid hours of building, it's recommended that you set up our binary cache.
+Instructions for this are on the [cachix page](https://disciplina.cachix.org).
+
 You need a patched version of nix. Upstream PR is currently pending. The correct
 version is provided as part of the overlay used in this repo. To install it,
 `cd` into repo base, and:
