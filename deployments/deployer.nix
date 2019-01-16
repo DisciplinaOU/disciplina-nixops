@@ -5,9 +5,12 @@
 
 let
   inherit (pkgs) lib;
-  wheel = [ "chris" "kirelagin" "lars" "yorick" ];
+  wheelUsers = [ "chris" "kirelagin" "lars" "yorick" ];
+  nixopsUsers = wheelUsers ++ [ ];
   expandUser = _name: keys: {
-    extraGroups = (lib.optional (builtins.elem _name wheel) "wheel") ++ [ "systemd-journal" ];
+    extraGroups = [ "systemd-journal" ]
+    ++ (lib.optional (builtins.elem _name wheelUsers) "wheel")
+    ++ (lib.optional (builtins.elem _name nixopsUsers) "nixops");
     isNormalUser = true;
     openssh.authorizedKeys.keys = keys;
   };
