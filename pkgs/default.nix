@@ -11,14 +11,15 @@ in {
     })];
   });
 
+  cachix = callPackage ./cachix.nix {};
   nix-with-cachix = callPackage ./nix-with-cachix {};
 
   nixops = callPackage ./nixops {
     inherit (previous) nixops;
   };
 
-  inherit (import <disciplina/release.nix> {}) disciplina-config disciplina;
-  disciplina-faucet-frontend = callPackage <disciplina-faucet-frontend/release.nix> {};
-  disciplina-explorer-frontend = callPackage <disciplina-explorer-frontend/release.nix> {};
-  disciplina-validatorcv = callPackage <disciplina-validatorcv/release.nix> {};
+  # inherit (import <disciplina/release.nix> {}) disciplina-config disciplina;
+  # disciplina-faucet-frontend = callPackage <disciplina-faucet-frontend/release.nix> {};
+  # disciplina-explorer-frontend = callPackage <disciplina-explorer-frontend/release.nix> {};
+  # disciplina-validatorcv = callPackage <disciplina-validatorcv/release.nix> {};
 }

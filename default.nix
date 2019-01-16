@@ -9,18 +9,18 @@ let
     nixpkgs = path;
     system = system;
 
-    args = {};
+    args = { domain = "cd.invalid"; };
     uuid = "000-000-000-000";
 
-    networkExprs = [ deployment ];
+  networkExprs = [ deployment ./deployments/ci-shim.nix ];
   };
   # buildSystems: needed so it doesn't build the vm's etc.
   buildSystems = nixops: recurseIntoAttrs (lib.mapAttrs
     (name: node: node.config.system.build.toplevel)
     nixops.nodes);
+  customPackages = lib.getAttrs (builtins.attrNames (import ./pkgs {} {})) pkgs;
 in
-
-{
+customPackages // {
   disciplina-cluster = buildSystems (evalNixOps ./deployments/cluster.nix);
   disciplina-deployer = buildSystems (evalNixOps ./deployments/deployer.nix);
 }
