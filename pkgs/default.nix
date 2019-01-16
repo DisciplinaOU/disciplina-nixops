@@ -4,6 +4,7 @@ let
   inherit (final) callPackage fetchpatch;
 
 in {
+  # cachix broken on nixpkgs: https://github.com/cachix/cachix/pull/149
   cachix = callPackage ./cachix.nix {};
   nix-with-cachix = callPackage ./nix-with-cachix {};
 
