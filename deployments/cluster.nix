@@ -59,25 +59,23 @@
 
     networking.firewall.allowedTCPPorts = [ 22 ];
 
-    dscp.keydir = toString env;
-    dscp.keys = {
-      committee-secret = { user = "disciplina"; services = [ "disciplina-witness" ]; shared = false; };
-      faucet-key = { user = "disciplina"; services = [ "disciplina-faucet" ]; shared = false; };
-    };
+    awskeys = {
+      committee-secret = {
+        inherit region;
+        user = "disciplina";
+        services = [ "disciplina-witness" ];
+        secretId = "${env}/disciplina/cluster";
+        key = "CommitteeSecret";
+      };
 
-    # awskeys = {
-    #   committee-secret = {
-    #     services = [ "disciplina-witness" ];
-    #     secretId = "${env}/disciplina/cluster";
-    #     key = "committee-secret";
-    #   };
-    #   faucet-key = {
-    #     services = [ "disciplina-faucet" ];
-    #     secretId = "${env}/disciplina/cluster";
-    #     key = "faucet-key";
-    #   };
-    # };
-    # aws secretsmanager get-secret-value --secret-id ${env}/disciplina/cluster | jq -r .SecretString
+      faucet-key = {
+        inherit region;
+        user = "disciplina";
+        services = [ "disciplina-faucet" ];
+        secretId = "${env}/disciplina/cluster";
+        key = "FaucetKey";
+      };
+    };
   };
 
   balancer = import ./cluster/balancer.nix env domain "a";
