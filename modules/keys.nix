@@ -62,7 +62,13 @@
             '';
           };
 
-          secretID = mkOption {
+          services = mkOption {
+            type = types.listOf types.string;
+            default = [];
+            example = [ "nginx" ];
+          };
+
+          secretId = mkOption {
             type = types.str;
             description = ''
               The secret name.
@@ -88,7 +94,7 @@
   };
 
   config = {
-    systemd.services = (flip mapAttrs' config.dscp.keys (name: keyCfg:
+    systemd.services = (flip mapAttrs' config.awskeys (name: keyCfg:
     nameValuePair "${name}-key" {
       requires = [ "network.target" ];
       after = requires;
@@ -104,7 +110,7 @@
         chmod ${keyCfg.permissions} ${keyCfg.path}
 
         aws secretsmanager get-secret-value \
-          --secret-id ${keyCfg.secretID} --region ${keyCfg.region} \
+          --secret-id ${keyCfg.secretId} --region ${keyCfg.region} \
           | jq -r .SecretString \
           ${lib.optionalString (keyCfg.key != null) "| jq -r .${keyCfg.key}"} \
           > ${keyCfg.path}
