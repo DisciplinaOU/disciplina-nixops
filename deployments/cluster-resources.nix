@@ -1,132 +1,47 @@
-{ region, env, domain }:
-
+{ region ? "eu-central-1"
+, domain
+, vpcId ? null
+, vpcCidr ? null
+, routeTableId ? null
+, ... }:
 let
-  mkIP = { resources, lib, ... }: {
-    inherit region;
-    vpc = true;
-  };
+  lib = import ./lib.nix { inherit region vpcCidr; };
+  inherit (lib) withVPC sg dns publicSubnet;
+in
+  {
+    resources = {
+      ec2KeyPairs.cluster-keypair = { inherit region; };
 
-  mkSG = rules: { resources, lib, ... }: {
-    inherit region rules;
-    vpcId = resources.vpc.cluster-vpc;
-  };
+      elasticIPs.balancer-eip = { inherit region; vpc = true; };
 
-  zone = "${region}a";
-  production = env == "production";
+      vpcSubnets.a-subnet = publicSubnet vpcId "${region}a" "10.1.41.0/24";
+      vpcSubnets.b-subnet = publicSubnet vpcId "${region}b" "10.1.42.0/24";
+      vpcSubnets.c-subnet = publicSubnet vpcId "${region}c" "10.1.43.0/24";
 
-in rec {
-  vpc.cluster-vpc = {
-    inherit region;
-    instanceTenancy = "default";
-    enableDnsSupport = true;
-    enableDnsHostnames = true;
-    cidrBlock = "10.0.0.0/16";
-  };
-
-  vpcSubnets.cluster-subnet =
-    { resources, lib, ... }:
-    {
-      inherit region zone;
-      vpcId = resources.vpc.cluster-vpc;
-      cidrBlock = "10.0.44.0/24";
-      mapPublicIpOnLaunch = true;
-    };
-
-  elasticIPs = if production then
-    {
-      balancer-ip = mkIP;
-      witness1-ip = mkIP;
-      witness2-ip = mkIP;
-      witness3-ip = mkIP;
-      educator-ip = mkIP;
-    } else {};
-
-  ec2SecurityGroups.cluster-http-public-sg = mkSG [
-    { fromPort =  80; toPort =  80; sourceIp = "0.0.0.0/0"; }
-    { fromPort = 443; toPort = 443; sourceIp = "0.0.0.0/0"; }
-  ];
-
-  ec2SecurityGroups.cluster-ssh-private-sg = mkSG [
-    { fromPort =    22; toPort =    22; sourceIp = vpc.cluster-vpc.cidrBlock; }
-  ];
-
-  ec2SecurityGroups.cluster-ssh-public-sg = mkSG [
-    { fromPort =    22; toPort =    22; sourceIp = "0.0.0.0/0"; }
-  ];
-
-  ec2SecurityGroups.cluster-witness-public-sg = mkSG [
-    { fromPort =  4010; toPort =  4011; sourceIp = "0.0.0.0/0"; }
-  ];
-
-  ec2SecurityGroups.cluster-witness-private-sg = mkSG [
-    { fromPort =  4010; toPort =  4011; sourceIp = vpc.cluster-vpc.cidrBlock; }
-  ];
-
-  ec2SecurityGroups.cluster-witness-api-public-sg = mkSG [
-    { fromPort =  4030; toPort =  4030; sourceIp = "0.0.0.0/0"; }
-  ];
-
-  ec2SecurityGroups.cluster-witness-api-private-sg = mkSG [
-    { fromPort =  4030; toPort =  4030; sourceIp = vpc.cluster-vpc.cidrBlock; }
-  ];
-
-  ec2SecurityGroups.cluster-educator-api-private-sg = mkSG [
-    { fromPort =  4040; toPort =  4040; sourceIp = vpc.cluster-vpc.cidrBlock; }
-  ];
-
-  vpcRouteTables.cluster-route-table =
-    { resources, ... }:
-    {
-      inherit region;
-      vpcId = resources.vpc.cluster-vpc;
-    };
-
-  vpcRouteTableAssociations.cluster-assoc =
-    { resources, ... }:
-    {
-      inherit region;
-      subnetId = resources.vpcSubnets.cluster-subnet;
-      routeTableId = resources.vpcRouteTables.cluster-route-table;
-    };
-
-  vpcInternetGateways.cluster-igw =
-    { resources, ... }:
-    {
-      inherit region;
-      vpcId = resources.vpc.cluster-vpc;
-    };
-
-  vpcRoutes.cluster-route =
-    { resources, ... }:
-    {
-      inherit region;
-      routeTableId = resources.vpcRouteTables.cluster-route-table;
-      destinationCidrBlock = "0.0.0.0/0";
-      gatewayId = resources.vpcInternetGateways.cluster-igw;
-    };
-
-  ec2KeyPairs.cluster-key = {
-    name = "cluster-kp";
-    inherit region;
-  };
-
-  route53RecordSets = let
-    lib = (import ../pkgs.nix).lib;
-    lastN = count: list: lib.drop (lib.length list - count) list;
-    domainToZone = d: ((lib.concatStringsSep "." (lastN 2 (lib.splitString "." d))) + ".");
-    mkLBCname = d:
-      { lib, nodes, ... }:
-      {
-        domainName = "${d}.${domain}.";
-        recordValues = [ "witness.${domain}" ];
-        recordType = "CNAME";
-        zoneName = domainToZone domain;
+      vpcRouteTableAssociations = with lib.rta; {
+        a-assoc = associate "a-subnet" routeTableId;
+        b-assoc = associate "b-subnet" routeTableId;
+        c-assoc = associate "c-subnet" routeTableId;
       };
-  in
-    lib.optionalAttrs (!production) {
-      rs-faucet = mkLBCname "faucet";
-      rs-explorer = mkLBCname "explorer";
-      rs-educator = mkLBCname "educator";
-      rs-validator = mkLBCname "validator";
+
+      ec2SecurityGroups = with sg vpcId; {
+        cluster-http-public-sg          = public  [ 80 443 ];
+        cluster-ssh-private-sg          = private [ 22 ];
+        cluster-ssh-public-sg           = public  [ 22 ];
+        cluster-witness-public-sg       = public  [ 4010 4011 ];
+        cluster-witness-private-sg      = private [ 4010 4011 ];
+        cluster-witness-api-public-sg   = public  [ 4030 ];
+        cluster-witness-api-private-sg  = private [ 4030 ];
+        cluster-educator-api-private-sg = private [ 4040 ];
+        # ssh-from-deployer-sg            = fromSubnet "deployer-subnet" [ 22 ];
+      };
+
+      route53RecordSets = with dns domain; {
+        rs-faucet    = cname "faucet.${domain}"   "witness.${domain}";
+        rs-explorer  = cname "explorer.${domain}" "witness.${domain}";
+        rs-educator  = cname "educator.${domain}" "witness.${domain}";
+        rs-validator = cname "validator.${domain}" "witness.${domain}";
+      };
+
     };
-}
+  }

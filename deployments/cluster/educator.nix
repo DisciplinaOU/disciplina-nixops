@@ -1,10 +1,8 @@
-env: n: { lib, name, nodes, pkgs, resources, ... }: with lib;
+zone: { lib, name, nodes, pkgs, resources, ... }: with lib;
 
 let
-  keys = config.dscp.keys;
   address = ip: ip + ":4010:4011";
   hasWitnessTag = node: elem "witness" node.config.system.nixos.tags;
-  hasInternalTag = node: elem "internal" node.config.system.nixos.tags;
 in
 
 {
@@ -13,6 +11,8 @@ in
   deployment.ec2.securityGroupIds = map (x: resources.ec2SecurityGroups."cluster-${x}-sg".name ) (
     [ "educator-api-private" "witness-public" ]
   );
+
+  deployment.ec2.subnetId = lib.mkForce resources.vpcSubnets."${zone}-subnet";
 
   networking.firewall.allowedTCPPorts = [
     4010 4011   # Witness ZMQ API
@@ -74,7 +74,7 @@ in
     in {
       inherit config-key;
       bind = address "*";
-      peer = map (node: address (if (hasInternalTag node) then node.config.networking.privateIPv4 else node.config.networking.publicIPv4))
+      peer = map (node: address node.config.networking.privateIPv4)
         (attrValues (filterAttrs (name2: node: name != name2 && hasWitnessTag node) nodes));
     };
   };

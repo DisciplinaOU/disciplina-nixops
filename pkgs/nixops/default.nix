@@ -1,9 +1,11 @@
-{ nixops, openssh }:
+{ nixops, openssh, fetchFromGitHub }:
 
 nixops.overrideAttrs (super: {
-  src = fetchGit {
-    url = https://github.com/serokell/nixops;
-    rev = "b2518d6b6656e36b4a571e41ee854ab325f4b86f";
+  src = fetchFromGitHub {
+    owner = "serokell";
+    repo = "nixops";
+    rev = "4f9e4d2d574a832b4e81a7c95d9c9cb1c7b0dffb";
+    sha256 = "0gnb4y9jaaxz9jyrvn3m5ns4av7i7wgy01jg2kbrgp1vsn88mw8y";
   };
 
   postPatch = ''

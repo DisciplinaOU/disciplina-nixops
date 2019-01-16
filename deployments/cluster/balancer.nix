@@ -1,6 +1,6 @@
 # TODO: add AWS ALB to NixOps and use that instead
 
-env: domain: { config, lib, pkgs, resources, ... }:
+env: domain: zone: { config, lib, pkgs, resources, ... }:
 
 let
   keys = config.dscp.keys;
@@ -18,6 +18,9 @@ in
   deployment.ec2.securityGroupIds = map (x: resources.ec2SecurityGroups."cluster-${x}-sg".name ) (
     [ "http-public" ]
   );
+
+  deployment.ec2.subnetId = lib.mkForce resources.vpcSubnets."${zone}-subnet";
+  deployment.ec2.elasticIPv4 = resources.elasticIPs.balancer-eip;
 
   boot.kernel.sysctl = {
     "net.core.somaxconn" = 4096;
@@ -83,6 +86,7 @@ in
 
   services.disciplina = let
     config-key = "alpha";
+    getSecret = k: ''"$(aws secretsmanager get-secret-value --secret-id ${env}/disciplina/cluster | jq -r .SecretString)"'';
 
   in rec {
     enable = true;

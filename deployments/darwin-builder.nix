@@ -32,7 +32,7 @@ in
       enable = true;
       package = pkgs.buildkite-agent3;
 
-      meta-data = "system=${pkgs.system}"; # TODO: rename, make into an attrset
+      tags.system = pkgs.system;
       runtimePackages = with pkgs; [ bash gnutar nix-with-cachix ];
       tokenPath = "${secrets}/buildkite-token";
 

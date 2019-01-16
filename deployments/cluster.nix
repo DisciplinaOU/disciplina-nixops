@@ -1,8 +1,15 @@
-{ region ? "eu-west-2", domain ? "see-readme.disciplina.site", env ? "staging"
-, hostType ? "ec2", pkgs ? import ../pkgs.nix }:
+{ region ? "eu-central-1"
+, env ? builtins.getEnv "DISCIPLINA_ENV"
+, domain ? "see-readme.dscp.serokell.review"
+, hostType ? "ec2"
+, pkgs ? import ../pkgs.nix
+, ...}:
 
 {
-  network.description = "Disciplina cluster";
+  network.description = "Disciplina cluster ${domain}";
+
+  require = pkgs.lib.optionals (hostType == "ec2")
+    [ ./cluster-resources.nix ];
 
   defaults = { resources, lib, name, ... }: {
     imports = [ ../modules ];
@@ -17,14 +24,21 @@
 
     deployment.ec2 = with resources; {
       inherit region;
+      keyPair = ec2KeyPairs.cluster-keypair;
       associatePublicIpAddress = lib.mkDefault true;
       ebsInitialRootDiskSize = lib.mkDefault 30;
-      elasticIPv4 = if (env == "production") then elasticIPs."${name}-ip" else "";
       instanceType = lib.mkDefault "t2.medium";
-      keyPair = ec2KeyPairs.cluster-key;
+      instanceProfile = "ReadDisciplinaSecrets";
       securityGroupIds = [ ec2SecurityGroups.cluster-ssh-public-sg.name ];
-      subnetId = lib.mkForce vpcSubnets.cluster-subnet;
     };
+    
+    # limit access to amazon roles and keys to root
+    networking.firewall.extraCommands = ''
+      iptables -A OUTPUT -m owner -p tcp -d 169.254.169.254 ! --uid-owner root -j nixos-fw-log-refuse
+    '';
+    networking.firewall.extraStopCommands = ''
+      iptables -D OUTPUT -m owner -p tcp -d 169.254.169.254 ! --uid-owner root -j nixos-fw-log-refuse || true
+    '';
 
     deployment.route53 = lib.optionalAttrs (env != "production") {
       usePublicDNSName = true;
@@ -45,22 +59,31 @@
 
     networking.firewall.allowedTCPPorts = [ 22 ];
 
-    dscp.keydir = env;
-    dscp.keys = {
-      committee-secret = { user = "disciplina"; services = [ "disciplina-witness" ]; shared = false; };
-      faucet-key = { user = "disciplina"; services = [ "disciplina-faucet" ]; shared = false; };
+    awskeys = {
+      committee-secret = {
+        inherit region;
+        user = "disciplina";
+        services = [ "disciplina-witness" ];
+        secretId = "${env}/disciplina/cluster";
+        key = "CommitteeSecret";
+      };
+
+      faucet-key = {
+        inherit region;
+        user = "disciplina";
+        services = [ "disciplina-faucet" ];
+        secretId = "${env}/disciplina/cluster";
+        key = "FaucetKey";
+      };
     };
   };
 
-  resources = pkgs.lib.optionalAttrs (hostType == "ec2")
-    (import ./cluster-resources.nix { inherit region env domain; });
+  balancer = import ./cluster/balancer.nix env domain "a";
 
-  balancer = import ./cluster/balancer.nix env domain;
+  witness0 = import ./cluster/witness.nix 0 "a";
+  witness1 = import ./cluster/witness.nix 1 "a";
+  witness2 = import ./cluster/witness.nix 2 "b";
+  witness3 = import ./cluster/witness.nix 3 "c";
 
-  witness0 = import ./cluster/witness.nix env 0;
-  witness1 = import ./cluster/witness.nix env 1;
-  witness2 = import ./cluster/witness.nix env 2;
-  witness3 = import ./cluster/witness.nix env 3;
-
-  educator = import ./cluster/educator.nix env 4;
+  educator = import ./cluster/educator.nix "a";
 }
