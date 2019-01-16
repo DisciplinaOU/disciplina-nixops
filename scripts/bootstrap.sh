@@ -9,7 +9,7 @@ fi
 
 deployment_repo="https://github.com/DisciplinaOU/disciplina-nixops"
 nixops_home="/var/lib/nixops"
-dname="dscp"
+export NIXOPS_DEPLOYMENT="deployer"
 
 
 unset AWS_SHARED_CREDENTIALS_FILE
@@ -17,32 +17,38 @@ unset AWS_SHARED_CREDENTIALS_FILE
 [ -f "$HOME/.aws/credentials" ] || {
   echo "* No AWS credentials file. Creating it..."
   mkdir -p "$HOME/.aws"
-  cat > "$HOME/.aws/credentials" <<EOF
-[default]
-aws_access_key_id=...
-aws_secret_access_key=...
-EOF
+  cat > "$HOME/.aws/credentials" <<-EOM
+	[default]
+	aws_access_key_id=...
+	aws_secret_access_key=...
+	EOM
   echo '** Put your credentials into $HOME/.aws/credentials'
   exit
 }
 
-if ! nixops info -d "$dname" >/dev/null 2>&1; then
+if ! nixops info >/dev/null 2>&1; then
   echo "* Creating the deployment..."
-  nixops create deployments/deployer.nix -d "$dname"
-  nixops set-args --argstr env production -d "$dname"
+  nixops create deployments/deployer.nix
+  nixops set-args --argstr env production
 else
-  echo "! You already have a deployment called '$dname'."
+  echo "! You already have a deployment called '$NIXOPS_DEPLOYMENT'."
   read -p "!! Press Enter to proceed with redeploying it..."
 fi
 
 echo "* Deploying..."
-nixops deploy -d "$dname"
+nixops deploy
 
 echo "* Moving everything to the deployer..."
-json=$(nixops export -d "$dname")
+json=$(nixops export)
 mkdir -p "$nixops_home"
-cmd="git clone \"$deployment_repo\" \"$nixops_home\"/disciplina-nixops && chown -R nixops:nixops \"$nixops_home\" && sudo -u nixops nixops import && sudo -u nixops nixops modify \"$nixops_home\"/disciplina-nixops/deployments/deployer.nix"
-echo "$json" | nixops ssh -d "$dname" disciplina-deployer -A "$cmd"
+read -d '' -r cmd <<-EOM
+	cd '$nixops_home' &&
+	git clone '$deployment_repo' &&
+	chown -R nixops:nixops . &&
+	sudo -u nixops nixops import -d '$NIXOPS_DEPLOYMENT' &&
+	sudo -u nixops nixops modify ./disciplina-nixops/deployments/deployer.nix
+	EOM
+echo "$json" | nixops ssh disciplina-deployer -A "$cmd"
 
 public_ip=$(echo "$json" | jq -r '.[].resources["disciplina-deployer"].publicDnsName')
 echo "* All done."
