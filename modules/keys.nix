@@ -94,8 +94,8 @@
   };
 
   config = {
-    systemd.services = (flip mapAttrs' config.awskeys (name: keyCfg:
-    nameValuePair "${name}-key" {
+    systemd.services = lib.mkMerge ([ (flip mapAttrs' config.awskeys (name: keyCfg:
+    nameValuePair "${name}-key" rec {
       requires = [ "network.target" ];
       after = requires;
       path = with pkgs; [ awscli jq ];
@@ -115,10 +115,10 @@
           ${lib.optionalString (keyCfg.key != null) "| jq -r .${keyCfg.key}"} \
           > ${keyCfg.path}
       '';
-    })) // lib.mkMerge (lib.mapAttrsToList (name: { services, ...}@val: lib.genAttrs services (service: rec {
+    })) ] ++ (lib.mapAttrsToList (name: { services, ...}@val: lib.genAttrs services (service: rec {
       requires = [ "${name}-key.service" ];
       after = requires;
       restartTriggers = [ (toString val) ];
-    })) config.awskeys);
+    })) config.awskeys));
   };
 }

@@ -28,7 +28,7 @@
       associatePublicIpAddress = lib.mkDefault true;
       ebsInitialRootDiskSize = lib.mkDefault 30;
       instanceType = lib.mkDefault "t2.medium";
-      instanceProfile = "ReadDisciplinaSecrets";
+      instanceProfile = "serokell-instances";
       securityGroupIds = [ ec2SecurityGroups.cluster-ssh-public-sg.name ];
     };
     
@@ -73,6 +73,7 @@
         user = "disciplina";
         services = [ "disciplina-faucet" ];
         secretId = "${env}/disciplina/cluster";
+        permissions = "400";
         key = "FaucetKey";
       };
     };
