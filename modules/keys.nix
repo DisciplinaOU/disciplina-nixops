@@ -84,6 +84,14 @@
             '';
           };
 
+          transform = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+            description = ''
+              Shell command to pipe the extracted key through to get it in the right format.
+            '';
+          };
+
           __toString = mkOption {
             default = self: self.path;
             readOnly = true;
@@ -114,6 +122,7 @@
           --secret-id ${keyCfg.secretId} --region ${keyCfg.region} \
           | jq -r .SecretString \
           ${lib.optionalString (keyCfg.key != null) "| jq -r .${keyCfg.key}"} \
+          ${lib.optionalString (keyCfg.transform != null) "| ${keyCfg.transform}"} \
           > ${keyCfg.path}
       '';
     })) ] ++ (lib.mapAttrsToList (name: { services, ...}@val: lib.genAttrs services (service: rec {
