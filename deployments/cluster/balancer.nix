@@ -93,7 +93,10 @@ in
     type = "faucet";
 
     config."${config-key}".faucet = {
-      appDir = "/var/lib/disciplina-${type}";
+      appDir.param = {
+        paramType = "specific";
+        specific.path = "/var/lib/disciplina-${type}";
+      };
       api.addr = "127.0.0.1:4014";
       witnessBackend = "http://witness1:4030";
       transferredAmount = 20;

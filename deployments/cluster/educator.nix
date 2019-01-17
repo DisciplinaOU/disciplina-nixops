@@ -30,38 +30,51 @@ in
 
     config."${config-key}" = rec {
       witness = rec {
-        appDir = "/var/lib/disciplina-${type}";
+        appDir.param = {
+          paramType = "specific";
+          specific.path = "/var/lib/disciplina-${type}";
+        };
         db = {
-          path = "${appDir}/witness.db";
+          path = "${appDir.param.specific.path}/witness.db";
           clean = false;
         };
-        api.addr = "0.0.0.0:4030";
-        keys = {
-          type = "basic";
-          path = "${appDir}/witness.key";
-          genNew = true;
+        api.maybe = {
+          maybeType = "just";
+          just.addr = "0.0.0.0:4030";
+        };
+        keys.params = {
+          paramsType = "basic";
+          basic = {
+            path = "${appDir.param.specific.path}/witness.key";
+            genNew = true;
+          };
         };
       };
 
       educator = {
         publishing.period = "30s";
         db.mode = {
-          path = "${witness.appDir}/educator.sqlite";
-          connNum = 4;
-          maxPending = 100;
+          modeType = "real";
+          real = {
+            path = "${witness.appDir.param.specific.path}/educator.sqlite";
+            connNum = 4;
+            maxPending = 100;
+          };
         };
 
-        keys = {
-          path = "${witness.appDir}/educator.key";
+        keys.keyParams = {
+          path = "${witness.appDir.param.specific.path}/educator.key";
           genNew = true;
         };
 
         api = {
           serverParams.addr = "0.0.0.0:4040";
-          botParams = {
-            enabled = true;
-            operationsDelay = "3s";
-            seed = "super secure"; # this is not sensitive data (https://serokell.slack.com/archives/CC92X27D3/p1542652947445200)
+          botConfig.params = {
+            paramsType = "enabled";
+            enabled = {
+              operationsDelay = "3s";
+              seed = "super secure"; # this is not sensitive data (https://serokell.slack.com/archives/CC92X27D3/p1542652947445200)
+            };
           };
           studentAPINoAuth.enabled = false;
           educatorAPINoAuth.enabled = false;
