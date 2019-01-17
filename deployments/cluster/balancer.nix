@@ -96,7 +96,7 @@ in
       api.addr = "127.0.0.1:4014";
       witnessBackend = "http://witness1:4030";
       transferredAmount = 20;
-      keys.keyParams = {
+      keys = {
         path = toString keys.faucet-key;
         genNew = false;
       };
