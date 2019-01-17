@@ -135,6 +135,7 @@ in {
         secrets="$(/run/wrappers/bin/sudo ${getBuildkiteSecrets})"
         export BUILDKITE_API_TOKEN=$(echo "$secrets" | jq -r .APIAccessToken)
         export CACHIX_SIGNING_KEY=$(echo "$secrets" | jq -r .CachixSigningKey)
+        export CACHIX_NAME=disciplina
         unset secrets
       '';
     };
