@@ -77,6 +77,7 @@
         secretId = "${env}/disciplina/cluster";
         permissions = "400";
         key = "FaucetKey";
+        transform = "${pkgs.disciplina-tools}/bin/dscp-keygen --secret keyfile";
       };
     };
   };
