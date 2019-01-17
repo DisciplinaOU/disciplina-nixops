@@ -39,7 +39,7 @@ in
         specific.path = "/var/lib/disciplina-${type}";
       };
       db = {
-        path = "${appDir}/witness.db";
+        path = "${appDir.param.specific.path}/witness.db";
         clean = false;
       };
       api.maybe = {

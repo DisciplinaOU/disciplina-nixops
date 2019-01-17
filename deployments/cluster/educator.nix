@@ -35,7 +35,7 @@ in
           specific.path = "/var/lib/disciplina-${type}";
         };
         db = {
-          path = "${appDir}/witness.db";
+          path = "${appDir.param.specific.path}/witness.db";
           clean = false;
         };
         api.maybe = {
@@ -45,7 +45,7 @@ in
         keys.params = {
           paramsType = "basic";
           basic = {
-            path = "${appDir}/witness.key";
+            path = "${appDir.param.specific.path}/witness.key";
             genNew = true;
           };
         };
@@ -56,14 +56,14 @@ in
         db.mode = {
           modeType = "real";
           real = {
-            path = "${witness.appDir}/educator.sqlite";
+            path = "${witness.appDir.param.specific.path}/educator.sqlite";
             connNum = 4;
             maxPending = 100;
           };
         };
 
         keys.keyParams = {
-          path = "${witness.appDir}/educator.key";
+          path = "${witness.appDir.param.specific.path}/educator.key";
           genNew = true;
         };
 
