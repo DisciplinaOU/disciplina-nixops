@@ -10,6 +10,7 @@ fi
 deployment_repo="https://github.com/DisciplinaOU/disciplina-nixops"
 nixops_home="/var/lib/nixops"
 export NIXOPS_DEPLOYMENT="deployer"
+export DISCIPLINA_ENV="bootstrap"
 
 
 unset AWS_SHARED_CREDENTIALS_FILE
@@ -29,7 +30,6 @@ unset AWS_SHARED_CREDENTIALS_FILE
 if ! nixops info >/dev/null 2>&1; then
   echo "* Creating the deployment..."
   nixops create deployments/deployer.nix
-  nixops set-args --argstr env production
 else
   echo "! You already have a deployment called '$NIXOPS_DEPLOYMENT'."
   read -p "!! Press Enter to proceed with redeploying it..."
