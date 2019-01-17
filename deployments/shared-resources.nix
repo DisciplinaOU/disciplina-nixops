@@ -1,7 +1,7 @@
 { region ? "eu-central-1"
 , ... }:
 let
-  lib = import ./lib.nix { inherit region; };
+  lib = import ./lib.nix { inherit region; dnsZone = "invalid"; };
   inherit (lib) withVPC publicSubnet rta igwroute sg;
 in
 {

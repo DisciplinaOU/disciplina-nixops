@@ -1,4 +1,5 @@
 { region
+, dnsZone
 , vpcCidr ? null }:
 
 ##
@@ -66,9 +67,6 @@ rec {
   # DSL to declare DNS records
   dns = domain: rec {
     lib = (import ../pkgs.nix).lib;
-    lastN = count: list: lib.drop (lib.length list - count) list;
-    domainToZone = d: ((lib.concatStringsSep "." (lastN 2 (lib.splitString "." d))) + ".");
-    zone = domainToZone domain;
 
     # Declare a cname record
     cname = from: to:
@@ -77,7 +75,7 @@ rec {
         domainName = "${from}.";
         recordValues = [ to ];
         recordType = "CNAME";
-        zoneName = zone;
+        zoneName = dnsZone;
       };
   };
 }

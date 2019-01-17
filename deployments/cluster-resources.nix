@@ -1,11 +1,12 @@
 { region ? "eu-central-1"
+, dnsZone ? "disciplina.io."
 , domain
 , vpcId ? null
 , vpcCidr ? null
 , routeTableId ? null
 , ... }:
 let
-  lib = import ./lib.nix { inherit region vpcCidr; };
+  lib = import ./lib.nix { inherit region dnsZone vpcCidr; };
   inherit (lib) withVPC sg dns publicSubnet;
 in
   {
