@@ -40,14 +40,13 @@ nixops deploy
 
 echo "* Moving everything to the deployer..."
 json=$(nixops export)
-mkdir -p "$nixops_home"
-read -d '' -r cmd <<-EOM
-	cd '$nixops_home' &&
-	git clone '$deployment_repo' &&
-	chown -R nixops:nixops . &&
-	sudo -u nixops nixops import -d '$NIXOPS_DEPLOYMENT' &&
-	sudo -u nixops nixops modify ./disciplina-nixops/deployments/deployer.nix
-	EOM
+cmd=""
+cmd+="mkdir -p '$nixops_home' && "
+cmd+="cd '$nixops_home' && "
+cmd+="git clone '$deployment_repo' && "
+cmd+="chown -R nixops:nixops . && "
+cmd+="sudo -u nixops nixops import -d '$NIXOPS_DEPLOYMENT' && "
+cmd+="sudo -u nixops nixops modify ./disciplina-nixops/deployments/deployer.nix"
 echo "$json" | nixops ssh disciplina-deployer -A "$cmd"
 
 public_ip=$(echo "$json" | jq -r '.[].resources["disciplina-deployer"].publicDnsName')
