@@ -29,6 +29,42 @@ deployer also serves as a CI agent.
 9.  Run `nixops deploy -d deployer` to finish deployment. This may again take
     several minutes as nixpkgs is being fetched.
 
+## Deploying a cluster
+
+1.  SSH to the deployer.
+2.  `cd` to `/var/lib/nixops` where deployer-wide state should be kept.
+3.  Create a directory for the cluster you want to deploy and `cd` to it.
+4.  Clone `https://github.com/DisciplinaOU/disciplina-nixops` and `cd` to it.
+5.  Run `export NIXOPS_DEPLOYMENT=<name>` to set the name of the cluster for this
+    session or pass `-d <name>` to every `nixops` command.
+6.  Create the cluster deployment entry with
+    `nixops create deployments/cluster.nix`. After this, it will fail to
+    evaluate until all necessary arguments have been set in the next three
+    steps.
+7.  Use `nixops set-args --argstr <key> <value>` to set the
+    following variables:
+
+    1.  Set `region` to the AWS region if it differs from `eu-central-1`.
+    2.  Set `clusterIndex` to an integer between 1 and 25. Every cluster deployed
+        from the same deployer should have a different cluster index.
+    3.  Set `env` to `staging` or `production` depending on which set of secrets
+        you want to use. If set to `production`, DNS will not be configured, so
+        the next two steps can be skipped.
+    4.  Set `domain` to the domain under which the domain names for the machines
+        should be created.
+    5.  Set `dnsZone` to the AWS DNS zone in which these domains can be
+        configured if it differs from `disciplina.io.`.
+
+8.  Run `scripts/setdeps.sh 'https://github.com/DisciplinaOU/'
+    '/archive/master.tar.gz' deployments/cluster.nix` to set the versions of
+    dependencies used. `master` can be replaced with other tags or branches that
+    are available in all dependencies. In order to use different sources for
+    different dependencies, you need to manually run `nixops modify` with a `-I`
+    option for each dependency.
+9.  Run `scripts/resources.sh deployer <name>` to give the cluster access to the
+    VPC and routing table of the deployer.
+10. Run `scripts/deploy.sh <name>` to deploy the cluster.
+
 ## Darwin builder
 
 [nix-darwin][] profile for macOS builder. Runs Buildkite to build macOS apps on
