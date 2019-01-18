@@ -3,7 +3,6 @@ Primary Disciplina deployment specification.
 To set up this repo, enter `nix-shell` and run:
 
 ```sh
-git crypt unlock
 cat .gitconfig >> .git/config
 ```
 

@@ -1,2 +1,0 @@
-[diff "sqlite3"]
-	textconv = sh -c 'sqlite3 $0 .dump'
