@@ -51,7 +51,7 @@ let
       # forward them to nixops
       key_json="$(sudo ${getNixopsSecurityCredentials})"
 
-      mkdir -m 700 /var/lib/nixops/.aws
+      mkdir -pm 700 /var/lib/nixops/.aws
       cat > /var/lib/nixops/.aws/credentials <<EOF
       [default]
       aws_access_key_id=$(echo "$key_json" | ${pkgs.jq}/bin/jq -r .AccessKeyId)
