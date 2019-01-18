@@ -41,35 +41,38 @@ let
   let
     git = "${pkgs.git}/bin/git -c user.name=nixops -c user.email=";
   in pkgs.writeShellScriptBin "nixops" ''
-    set -euo pipefail
+    sudo NIXOPS_DEPLOYMENT="$NIXOPS_DEPLOYMENT" -u nixops ${
+      pkgs.writeShellScriptBin "nixopswrapper" ''
+      set -euo pipefail
 
-    [ "$(whoami)" = "nixops" ] || { echo Please run with sudo -u nixops; exit 1; }
+      [ "$(whoami)" = "nixops" ] || { echo Please run with sudo -u nixops; exit 1; }
 
-    # Download AWS credentials using the serokell-nixops instance profile and
-    # forward them to nixops
-    key_json="$(sudo ${getNixopsSecurityCredentials})"
+      # Download AWS credentials using the serokell-nixops instance profile and
+      # forward them to nixops
+      key_json="$(sudo ${getNixopsSecurityCredentials})"
 
-    mkdir -p /var/lib/nixops/.aws
-    cat > /var/lib/nixops/.aws/credentials <<EOF
-    [default]
-    aws_access_key_id=$(echo "$key_json" | ${pkgs.jq}/bin/jq -r .AccessKeyId)
-    aws_secret_access_key=$(echo "$key_json" | ${pkgs.jq}/bin/jq -r .SecretAccessKey)
-    aws_session_token=$(echo "$key_json" | ${pkgs.jq}/bin/jq -r .Token)
-    EOF
+      mkdir -p /var/lib/nixops/.aws
+      cat > /var/lib/nixops/.aws/credentials <<EOF
+      [default]
+      aws_access_key_id=$(echo "$key_json" | ${pkgs.jq}/bin/jq -r .AccessKeyId)
+      aws_secret_access_key=$(echo "$key_json" | ${pkgs.jq}/bin/jq -r .SecretAccessKey)
+      aws_session_token=$(echo "$key_json" | ${pkgs.jq}/bin/jq -r .Token)
+      EOF
 
-    AWS_ACCESS_KEY_ID=default ${pkgs.nixops}/bin/nixops "$@"
-    rv=$?
+      AWS_ACCESS_KEY_ID=default ${pkgs.nixops}/bin/nixops "$@"
+      rv=$?
 
-    cd /var/lib/nixops/.nixops
-    [ -e .git ] || {
-      ${git} init -q
-      ${git} commit --allow-empty -qm "initial commit"
-    }
+      cd /var/lib/nixops/.nixops
+      [ -e .git ] || {
+        ${git} init -q
+        ${git} commit --allow-empty -qm "initial commit"
+      }
 
-    ${git} add .
-    ${git} diff-index --quiet HEAD || \
-      ${git} commit -qm "nixops $*"
-    exit $rv
+      ${git} add .
+      ${git} diff-index --quiet HEAD || \
+        ${git} commit -qm "nixops $*"
+      exit $rv
+    ''}/bin/nixopsWrapper "$@"
   '';
 
 in {
