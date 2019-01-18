@@ -42,7 +42,7 @@ let
     git = "${pkgs.git}/bin/git -c user.name=nixops -c user.email=";
   in pkgs.writeShellScriptBin "nixops" ''
     sudo NIXOPS_DEPLOYMENT="$NIXOPS_DEPLOYMENT" -u nixops ${
-      pkgs.writeShellScriptBin "nixopswrapper" ''
+      pkgs.writeShellScriptBin "nixopsWrapper" ''
       set -euo pipefail
 
       [ "$(whoami)" = "nixops" ] || { echo Please run with sudo -u nixops; exit 1; }
