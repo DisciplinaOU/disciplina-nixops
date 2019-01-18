@@ -1,9 +1,17 @@
 { region ? "eu-central-1"
 , env ? builtins.getEnv "DISCIPLINA_ENV"
-, pkgs ? import ../pkgs.nix
+, pkgs0 ? import ../pkgs.nix
 , ...}:
 
 let
+  pkgs = if env != "bootstrap" then pkgs0 else pkgs0.extend
+    (self: super: {
+      nix = super.nix.overrideDerivation (_: {
+        patches = null;
+        doInstallCheck = true;
+      });
+    });
+
   inherit (pkgs) lib;
   wheelUsers = [ "chris" "kirelagin" "lars" "yorick" ];
   nixopsUsers = wheelUsers ++ [ ];
@@ -115,7 +123,7 @@ in {
     nixpkgs.pkgs = pkgs;
 
     services.buildkite-agents.${buildkiteAgentName} = {
-      enable = true;
+      enable = env != "bootstrap";
 
       runtimePackages = with pkgs; [ bash gnutar nix-with-cachix jq ];
 
