@@ -1,6 +1,6 @@
 { region ? "eu-central-1"
 , dnsZone ? "disciplina.io."
-, env ? builtins.getEnv "DISCIPLINA_ENV"
+, env ? "staging"
 , domain ? "see-readme.dscp.serokell.review"
 , hostType ? "ec2"
 , pkgs ? import ../pkgs.nix

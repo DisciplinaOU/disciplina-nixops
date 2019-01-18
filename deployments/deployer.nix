@@ -1,5 +1,5 @@
 { region ? "eu-central-1"
-, env ? builtins.getEnv "DISCIPLINA_ENV"
+, env
 , pkgs0 ? import ../pkgs.nix
 , ...}:
 
