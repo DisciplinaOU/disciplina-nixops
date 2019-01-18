@@ -12,6 +12,7 @@ let
     args = {
       domain = "cd.invalid";
       clusterIndex = "";
+      env = "ci";
     };
 
     uuid = "000-000-000-000";
