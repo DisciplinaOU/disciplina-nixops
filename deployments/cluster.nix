@@ -1,4 +1,5 @@
 { region ? "eu-central-1"
+, clusterIndex
 , dnsZone ? "disciplina.io."
 , env ? "staging"
 , domain ? "see-readme.dscp.serokell.review"

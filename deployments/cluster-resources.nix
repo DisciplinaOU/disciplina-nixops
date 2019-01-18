@@ -1,4 +1,5 @@
 { region ? "eu-central-1"
+, clusterIndex
 , dnsZone ? "disciplina.io."
 , domain
 , vpcId ? null
@@ -15,9 +16,9 @@ in
 
       elasticIPs.balancer-eip = { inherit region; vpc = true; };
 
-      vpcSubnets.a-subnet = publicSubnet vpcId "${region}a" "10.1.41.0/24";
-      vpcSubnets.b-subnet = publicSubnet vpcId "${region}b" "10.1.42.0/24";
-      vpcSubnets.c-subnet = publicSubnet vpcId "${region}c" "10.1.43.0/24";
+      vpcSubnets.a-subnet = publicSubnet vpcId "${region}a" "10.1.${clusterIndex}1.0/24";
+      vpcSubnets.b-subnet = publicSubnet vpcId "${region}b" "10.1.${clusterIndex}2.0/24";
+      vpcSubnets.c-subnet = publicSubnet vpcId "${region}c" "10.1.${clusterIndex}3.0/24";
 
       vpcRouteTableAssociations = with lib.rta; {
         a-assoc = associate "a-subnet" routeTableId;
