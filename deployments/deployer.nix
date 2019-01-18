@@ -215,7 +215,7 @@ in {
 
     system.activationScripts.nixops = lib.stringAfter [ "users" "groups" ] ''
       chmod g+rwxs ${config.users.users.nixops.home}
-      setfacl -m d:g:nixops:rwX ${config.users.users.nixops.home}
+      ${pkgs.acl}/bin/setfacl -m d:g:nixops:rwX ${config.users.users.nixops.home}
     '';
   };
 }
