@@ -44,7 +44,7 @@
 
     deployment.route53 = lib.optionalAttrs (env != "production") {
       usePublicDNSName = true;
-      hostname = "${name}.${domain}";
+      hostName = "${name}.${domain}";
     };
 
     system.nixos.tags = lib.optional (hostType == "virtualbox") "internal";

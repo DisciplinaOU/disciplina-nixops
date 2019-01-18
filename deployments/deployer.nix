@@ -79,7 +79,7 @@ in {
   network.description = "Disciplina - shared infra";
   require = [ ./shared-resources.nix ];
 
-  disciplina-deployer = { config, resources, ... }: {
+  deployer = { config, name, resources, ... }: {
     deployment.targetEnv = "ec2";
 
     deployment.ec2 = with resources; {
@@ -97,10 +97,9 @@ in {
 
     deployment.route53 = {
       usePublicDNSName = true;
-      hostname = "deployer.${domain}";
+      hostName = "${name}.${domain}";
     };
 
-    # networking.hostName = "disciplina-deployer";
     documentation.enable = false;
 
     environment.systemPackages = with pkgs; [ git nixopsWrapper ];
