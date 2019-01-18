@@ -1,4 +1,5 @@
 { region ? "eu-central-1"
+, domain
 , env
 , pkgs0 ? import ../pkgs.nix
 , ...}:
@@ -89,6 +90,11 @@ in {
       subnetId = vpcSubnets.deployer-subnet;
       securityGroupIds = with ec2SecurityGroups;
         [ ssh-public-sg.name ];
+    };
+
+    deployment.route53 = {
+      usePublicDNSName = true;
+      hostname = "deployer.${domain}";
     };
 
     # networking.hostName = "disciplina-deployer";
