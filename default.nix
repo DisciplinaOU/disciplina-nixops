@@ -9,7 +9,11 @@ let
     nixpkgs = path;
     system = system;
 
-    args = { domain = "cd.invalid"; };
+    args = {
+      domain = "cd.invalid";
+      clusterIndex = "";
+    };
+
     uuid = "000-000-000-000";
 
   networkExprs = [ deployment ./deployments/ci/shim.nix ];
