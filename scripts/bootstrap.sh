@@ -10,11 +10,11 @@ deployer_env="production"
 deployer_domain="example.net.disciplina.io"
 
 deployment_repo="https://github.com/DisciplinaOU/disciplina-nixops"
-NIXOPS_DEPLOYMENT="deployer"
-AWS_SHARED_CREDENTIALS_FILE="$HOME/.aws/credentials"
+export NIXOPS_DEPLOYMENT="deployer"
+export AWS_SHARED_CREDENTIALS_FILE="$HOME/.aws/credentials"
 
 # Do not change this. Use a different credential file if necessary.
-AWS_ACCESS_KEY_ID="default"
+export AWS_ACCESS_KEY_ID="default"
 nixops_home="/var/lib/nixops"
 
 [ -f "$AWS_SHARED_CREDENTIALS_FILE" ] || {
