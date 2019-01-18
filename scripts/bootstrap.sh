@@ -1,19 +1,14 @@
-#!/usr/bin/env bash
+#!/usr/bin/env nix-shell
+#!nix-shell -i bash -p bash jq nixops
 
 set -euo pipefail
 
-if [ -z "$IN_NIX_SHELL" ]; then
-  echo >&2 "Please, run this script from inside nix-shell."
-  exit 1
-fi
-
 deployment_repo="https://github.com/DisciplinaOU/disciplina-nixops"
 nixops_home="/var/lib/nixops"
+
+export AWS_ACCESS_KEY_ID="default"
 export NIXOPS_DEPLOYMENT="deployer"
 export DISCIPLINA_ENV="bootstrap"
-
-
-unset AWS_SHARED_CREDENTIALS_FILE
 
 [ -f "$HOME/.aws/credentials" ] || {
   echo "* No AWS credentials file. Creating it..."
@@ -47,7 +42,7 @@ cmd+="git clone '$deployment_repo' && "
 cmd+="chown -R nixops:nixops . && "
 cmd+="sudo -u nixops nixops import -d '$NIXOPS_DEPLOYMENT' && "
 cmd+="sudo -u nixops nixops modify ./disciplina-nixops/deployments/deployer.nix"
-echo "$json" | nixops ssh disciplina-deployer -A "$cmd"
+echo "$json" | nixops ssh disciplina-deployer "$cmd"
 
 public_ip=$(echo "$json" | jq -r '.[].resources["disciplina-deployer"].publicDnsName')
 echo "* All done."
