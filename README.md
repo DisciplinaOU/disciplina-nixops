@@ -1,10 +1,33 @@
 Primary Disciplina deployment specification.
 
-To set up this repo, enter `nix-shell` and run:
+To use this repo, enter `nix-shell`.
 
-```sh
-cat .gitconfig >> .git/config
-```
+# Deploying
+
+Deploying clusters works through a deployer. The first step is therefor to
+deploy a deployer. From it, several clusters can be easily deployed. The
+deployer also serves as a CI agent.
+
+## Deploying a deployer
+
+1.  Log into a machine with nix installed.
+2.  Clone `https://github.com/DisciplinaOU/disciplina-nixops` and `cd` to it.
+3.  Commit your SSH public key into `deployments/ssh-keys.nix` in the
+    `disciplina-nixops` repository and add yourself to the `wheel` group in
+    `deployments/deployer.nix`.
+4.  Put your aws credentials in `~/.aws/credentials` in the following format:
+
+        [default]
+        aws_access_key_id=...
+        aws_secret_access_key=...
+
+5.  Check `scripts/bootstrap.sh` and modify variables if needed.
+6.  Enter `nix-shell`. This may take several minutes as nixpkgs is being
+    fetched.
+7.  Run `scripts/bootstrap.sh`.
+8.  SSH into the domain name printed by the script.
+9.  Run `nixops deploy -d deployer` to finish deployment. This may again take
+    several minutes as nixpkgs is being fetched.
 
 ## Darwin builder
 
