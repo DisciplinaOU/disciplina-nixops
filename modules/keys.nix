@@ -100,6 +100,7 @@
       after = requires;
       path = with pkgs; [ awscli jq ];
 
+      serviceConfig.Type = "oneshot";
       script = ''
         set -euo pipefail
         mkdir -p /run/keys
