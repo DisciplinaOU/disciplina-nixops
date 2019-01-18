@@ -212,6 +212,9 @@ in {
 
       wheelNeedsPassword = false;
     };
-  };
 
+    system.activationScripts.nixops = lib.stringAfter [ "users" "groups" ] ''
+      chmod g+rwxs ${config.users.users.nixops.home}
+    '';
+  };
 }
