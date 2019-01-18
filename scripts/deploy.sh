@@ -1,5 +1,4 @@
-#!/usr/bin/env nix-shell
-#! nix-shell ../shell.nix -i bash
+#!/usr/bin/env bash
 #
 # This script deploys a cluster in 3 stages:
 # - Base network
