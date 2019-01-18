@@ -51,7 +51,7 @@ let
       # forward them to nixops
       key_json="$(sudo ${getNixopsSecurityCredentials})"
 
-      mkdir -p /var/lib/nixops/.aws
+      mkdir -m 700 /var/lib/nixops/.aws
       cat > /var/lib/nixops/.aws/credentials <<EOF
       [default]
       aws_access_key_id=$(echo "$key_json" | ${pkgs.jq}/bin/jq -r .AccessKeyId)
@@ -215,6 +215,7 @@ in {
 
     system.activationScripts.nixops = lib.stringAfter [ "users" "groups" ] ''
       chmod g+rwxs ${config.users.users.nixops.home}
+      setfacl -m d:g:nixops:rwX ${config.users.users.nixops.home}
     '';
   };
 }
