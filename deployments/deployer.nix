@@ -129,7 +129,6 @@ in {
 
       tags.hostname = config.networking.hostName;
       tags.system = pkgs.system;
-      tags.deploy = "true";
 
       # tokenPath is cat'd into the buildkite config file, as root
       # https://github.com/serokell/nixpkgs/blob/e68ada3bfc8142ca94526cd5f39fcc58e57b85a4/nixos/modules/services/continuous-integration/buildkite-agents.nix#L258
