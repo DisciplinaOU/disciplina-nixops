@@ -77,7 +77,7 @@ An agent associates itself with a BK project by providing it with a secret token
 The deployment pipeline can be found here: https://buildkite.com/disciplina/disciplina-deploy
 
 When this particular pipeline is triggered, it will check out the associated Git
-repository, import `.buildkite/pipeline.deploy.yaml` and run the steps defined therein.
+repository, import `.buildkite/deploy.yml` and run the steps defined therein.
 
 This repository should contain all things necessary for a deployment, one way or
 another. Git submodules are one way.
