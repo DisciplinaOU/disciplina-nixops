@@ -3,7 +3,7 @@
 # shellcheck shell=bash
 
 #
-# Usage: ./resources.sh <src_deployment> <tgt_deployment>
+# Usage: ./resources.sh <source_deployment> <target_deployment>
 #
 # This script reads the resource IDs from one deployment and feeds them
 # to another deployment via `nixops set-args`.
@@ -28,7 +28,7 @@ from="$1"
 to="$2"
 
 [ -n "$from" -o -n "$to" ] || {
-  echo >&2 "Usage: $0 <src_deployment> <tgt_deployment>"
+  echo >&2 "Usage: $0 <source_deployment> <target_deployment>"
   exit 1
 }
 

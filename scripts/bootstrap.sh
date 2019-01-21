@@ -22,7 +22,6 @@ deployer_domain="net.disciplina.io"
 aws_credentials_file="$HOME/.aws/credentials"
 
 deployment_repo="https://github.com/DisciplinaOU/disciplina-nixops"
-nixops_home="/var/lib/nixops"
 
 
 ################################################################################
@@ -62,6 +61,7 @@ echo "* Deploying..."
 nixops deploy
 
 echo "* Moving everything to the deployer..."
+nixops_home="/var/lib/nixops"
 state=$(nixops export)
 cmd=""
 cmd+="cd '$nixops_home' && "
