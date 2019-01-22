@@ -14,7 +14,7 @@ let
     });
 
   inherit (pkgs) lib;
-  wheelUsers = [ "chris" "kirelagin" "lars" "yorick" ];
+  wheelUsers = [ "chris" "kirelagin" "lars" "yorick" "dboulas" ];
   nixopsUsers = wheelUsers ++ [ ];
   expandUser = _name: keys: {
     extraGroups = [ "systemd-journal" ]
