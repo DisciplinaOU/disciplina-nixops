@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+
+#
+# Usage: ./deploy.sh <deployment>
 #
 # This script deploys a cluster in 3 stages:
 # - Base network
@@ -13,12 +16,23 @@
 
 set -exuo pipefail
 
+################################################################################
+################################################################################
+
+
+dep="$1"
+
+[ -n "$dep" ] || {
+  echo >&2 "Usage: $0 <deployment>"
+  exit 1
+}
+export NIXOPS_DEPLOYMENT="$dep"
+
 declare -a NIXOPS_OPTIONS MACHINES STAGE2
 NIXOPS_OPTIONS=( --show-trace )
 MACHINES=( balancer educator witness0 witness1 witness2 witness3 )
 STAGE2=( a-assoc b-assoc c-assoc )
-DEP="${1:-disciplina}"
 
-nixops deploy -d "$DEP" "${NIXOPS_OPTIONS[@]}" --exclude "${MACHINES[@]}" "${STAGE2[@]}"
-nixops deploy -d "$DEP" "${NIXOPS_OPTIONS[@]}" --exclude "${MACHINES[@]}"
-nixops deploy -d "$DEP" "${NIXOPS_OPTIONS[@]}"
+nixops deploy "${NIXOPS_OPTIONS[@]}" --exclude "${MACHINES[@]}" "${STAGE2[@]}"
+nixops deploy "${NIXOPS_OPTIONS[@]}" --exclude "${MACHINES[@]}"
+nixops deploy "${NIXOPS_OPTIONS[@]}"
