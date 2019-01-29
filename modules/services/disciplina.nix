@@ -50,6 +50,14 @@ in
         Set of arguments passed to witness CLI
       '';
     };
+
+    after = mkOption {
+      type = types.listOf types.str;
+      default = [];
+      description = ''
+        Systemd services that this one has to be started after.
+      '';
+    };
   };
 
   config = mkIf cfg.enable {
@@ -62,7 +70,7 @@ in
     };
 
     systemd.services."disciplina-${cfg.type}" = rec {
-      after = [ "network.target" ];
+      after = [ "network.target" ] ++ cfg.after;
       requires = after;
       wantedBy = [ "multi-user.target" ];
 

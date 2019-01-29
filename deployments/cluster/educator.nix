@@ -20,6 +20,17 @@ in
     4040        # Educator HTTP API
   ];
 
+  services.postgresql = {
+    enable = true;
+    authentication = ''
+      host all postgres 127.0.0.1/32 trust
+    '';
+    initialScript =
+      let
+        inherit (pkgs.disciplina-educator) name compiler;
+      in "${pkgs.disciplina-data}/share/${compiler.name}/${compiler.system}-${compiler.name}/${name}/database/schema.sql";
+  };
+
   services.disciplina = let
     config-key = "alpha";
 
@@ -53,13 +64,10 @@ in
 
       educator = {
         publishing.period = "30s";
-        db.mode = {
-          modeType = "real";
-          real = {
-            path = "${witness.appDir.param.specific.path}/educator.sqlite";
-            connNum = 4;
-            maxPending = 100;
-          };
+        db = {
+          connString = "postgresql://postgres@localhost";
+          connNum = 4;
+          maxPending = 100;
         };
 
         keys.keyParams = {
@@ -90,6 +98,8 @@ in
       peer = map (node: address node.config.networking.privateIPv4)
         (attrValues (filterAttrs (name2: node: name != name2 && hasWitnessTag node) nodes));
     };
+
+    after = [ "postgresql.service" ];
   };
 
   system.nixos.tags = [ "educator" "witness" ];
