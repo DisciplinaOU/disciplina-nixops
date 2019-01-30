@@ -24,6 +24,7 @@ in
     enable = true;
     authentication = ''
       host all postgres 127.0.0.1/32 trust
+      host all postgres ::1/128      trust
     '';
     initialScript =
       let
