@@ -51,11 +51,12 @@ in
       '';
     };
 
-    after = mkOption {
+    requires = mkOption {
       type = types.listOf types.str;
       default = [];
       description = ''
-        Systemd services that this one has to be started after.
+        Systemd services that this one depends on.
+        Will be added to Requires in After in the systemd unit.
       '';
     };
 
@@ -79,7 +80,7 @@ in
     };
 
     systemd.services."disciplina-${cfg.type}" = rec {
-      after = [ "network.target" ] ++ cfg.after;
+      after = [ "network.target" ] ++ cfg.requires;
       requires = after;
       wantedBy = [ "multi-user.target" ];
 
