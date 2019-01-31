@@ -80,8 +80,8 @@ in
     };
 
     systemd.services."disciplina-${cfg.type}" = rec {
-      after = [ "network.target" ] ++ cfg.requires;
-      requires = after;
+      inherit (cfg) requires;
+      after = [ "network.target" ] ++ requires;
       wantedBy = [ "multi-user.target" ];
 
       path = with pkgs; [ curl ];
