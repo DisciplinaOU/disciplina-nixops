@@ -91,7 +91,7 @@ in
         (attrValues (filterAttrs (name2: node: name != name2 && hasWitnessTag node) nodes));
     };
 
-    required = [ "postgresql.service" ];
+    requires = [ "postgresql.service" ];
     serviceConfig = {
       ExecStartPre =
         let
