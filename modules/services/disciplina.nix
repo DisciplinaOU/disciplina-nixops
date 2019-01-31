@@ -58,6 +58,15 @@ in
         Systemd services that this one has to be started after.
       '';
     };
+
+    serviceConfig = mkOption {
+      default = {};
+      type = types.attrs;
+      description = ''
+        Systemd serviceConfig.
+      '';
+    };
+
   };
 
   config = mkIf cfg.enable {
@@ -85,7 +94,7 @@ in
         User = "disciplina";
         WorkingDirectory = stateDir;
         StateDirectory = "disciplina-${cfg.type}";
-      };
+      } // cfg.serviceConfig;
     };
   };
 }

@@ -20,17 +20,7 @@ in
     4040        # Educator HTTP API
   ];
 
-  services.postgresql = {
-    enable = true;
-    authentication = ''
-      host all postgres 127.0.0.1/32 trust
-      host all postgres ::1/128      trust
-    '';
-    initialScript =
-      let
-        inherit (pkgs.disciplina-educator) name compiler;
-      in "${pkgs.disciplina-data}/share/${compiler.name}/${compiler.system}-${compiler.name}/${name}/database/schema.sql";
-  };
+  services.postgresql.enable = true;
 
   services.disciplina = let
     config-key = "alpha";
@@ -66,7 +56,7 @@ in
       educator = {
         publishing.period = "30s";
         db = {
-          connString = "postgresql://postgres@localhost";
+          connString = "postgresql://disciplina@/disciplina";
           connNum = 4;
           maxPending = 100;
         };
@@ -91,9 +81,7 @@ in
       };
     };
 
-    args = let
-      cat = path: ''"$(cat "${path}")"'';
-    in {
+    args = {
       inherit config-key;
       bind = address "*";
       peer = map (node: address node.config.networking.privateIPv4)
@@ -101,6 +89,29 @@ in
     };
 
     after = [ "postgresql.service" ];
+    serviceConfig = {
+      ExecStartPre =
+        let
+          psql = args:
+            "${pkgs.sudo}/bin/sudo -u postgres ${pkgs.postgresql}/bin/psql " + args;
+          dbUserInitScript = pkgs.writeText "educator-db-user.sql" ''
+            DO $$
+            BEGIN
+               IF NOT EXISTS
+                 (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'disciplina')
+               THEN
+                 CREATE ROLE disciplina LOGIN;
+               END IF;
+            END $$;
+          '';
+          dbInitScript = pkgs.writeText "educator-db.sql" ''
+            CREATE DATABASE disciplina OWNER disciplina;
+          '';
+        in [
+          "!${psql "-v ON_ERROR_STOP -f ${dbUserInitScript}"}"
+          "!${psql "-f ${dbInitScript}"}"  # ignores errors
+        ];
+    };
   };
 
   system.nixos.tags = [ "educator" "witness" ];
