@@ -50,6 +50,24 @@ in
         Set of arguments passed to witness CLI
       '';
     };
+
+    requires = mkOption {
+      type = types.listOf types.str;
+      default = [];
+      description = ''
+        Systemd services that this one depends on.
+        Will be added to Requires and After in the systemd unit.
+      '';
+    };
+
+    serviceConfig = mkOption {
+      default = {};
+      type = types.attrs;
+      description = ''
+        Systemd serviceConfig.
+      '';
+    };
+
   };
 
   config = mkIf cfg.enable {
@@ -62,8 +80,8 @@ in
     };
 
     systemd.services."disciplina-${cfg.type}" = rec {
-      after = [ "network.target" ];
-      requires = after;
+      inherit (cfg) requires;
+      after = [ "network.target" ] ++ requires;
       wantedBy = [ "multi-user.target" ];
 
       path = with pkgs; [ curl ];
@@ -77,7 +95,7 @@ in
         User = "disciplina";
         WorkingDirectory = stateDir;
         StateDirectory = "disciplina-${cfg.type}";
-      };
+      } // cfg.serviceConfig;
     };
   };
 }
