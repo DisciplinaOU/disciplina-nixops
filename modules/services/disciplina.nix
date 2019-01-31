@@ -56,7 +56,7 @@ in
       default = [];
       description = ''
         Systemd services that this one depends on.
-        Will be added to Requires in After in the systemd unit.
+        Will be added to Requires and After in the systemd unit.
       '';
     };
 
