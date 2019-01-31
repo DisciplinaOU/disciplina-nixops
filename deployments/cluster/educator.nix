@@ -20,7 +20,10 @@ in
     4040        # Educator HTTP API
   ];
 
-  services.postgresql.enable = true;
+  services.postgresql = {
+    enable = true;
+    package = pkgs.postgresql_9_6;
+  };
 
   services.disciplina = let
     config-key = "alpha";
