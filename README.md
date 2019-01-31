@@ -82,8 +82,32 @@ deployer also serves as a CI agent.
     VPC and routing table of the deployer.
 10. Run `./scripts/deploy.sh <name>` to deploy the cluster.
 
+## Setting up continuous delivery
 
-# Darwin builder
+Continuous Delivery is conceptually the same as continuous integration: a
+pipeline is triggered on BuildKite, which makes the associated BK agent run some
+commands. The same agent runs both CI and CD for disciplina, and it runs on the
+deployer.
+
+An agent associates itself with a BK project by providing it with a secret token.
+
+The deployment pipeline can be found here: https://buildkite.com/disciplina/disciplina-deploy
+
+When this particular pipeline is triggered, it will check out the associated Git
+repository, import `.buildkite/deploy.yml` and run the steps defined therein.
+
+This repository should contain all things necessary for a deployment, one way or
+another. Git submodules are one way.
+
+These steps should include running `nixops` to deploy whatever it is you want to deploy.
+
+In order to avoid running on build-only agents, this will only run on builders
+with a tag `deploy=true`.
+
+We have a Slack command `/deploy` that asks GitHub to trigger a deployment
+event, which this BK pipeline is configured to respond to.
+
+## Darwin builder
 
 [nix-darwin][] profile for macOS builder. Runs Buildkite to build macOS apps on
 CI for QA team.
