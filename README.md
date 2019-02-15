@@ -82,6 +82,21 @@ deployer also serves as a CI agent.
     VPC and routing table of the deployer.
 10. Run `./scripts/deploy.sh <name>` to deploy the cluster.
 
+## Managing secrets
+
+Secrets are stored in aws secretsmanager. The set of secrets that should be used
+can be selected by setting the `env` variable using `set-args`, as mentioned
+above. For example, when `env` is set to `production`, the cluster uses the
+secret called `production/disciplina/cluster`. Note, that as a special case,
+when `env` is set to `production`, DNS will be disabled. The following secrets
+are used:
+
+- `<env>/disciplina/cluster` is used by the cluster. It should be a JSON object
+  containing the following keys: `CommitteeSecret` and `FaucetKey`.
+- `<env>/disciplina/buildkite` is used by the buildkite agent. It should be a
+  JSON object containing the following keys: `AgentToken`, `APIAccessToken` and
+  `CachixSigningKey`.
+
 ## Setting up continuous delivery
 
 Continuous Delivery is conceptually the same as continuous integration: a
