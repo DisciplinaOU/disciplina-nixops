@@ -1,4 +1,4 @@
-zone: { lib, name, nodes, pkgs, resources, ... }: with lib;
+domain: zone: { lib, name, nodes, pkgs, resources, ... }: with lib;
 
 let
   address = ip: ip + ":4010:4011";
