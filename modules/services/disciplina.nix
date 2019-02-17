@@ -15,7 +15,7 @@ in
 
 {
   options.services.disciplina = {
-    enable = mkEnableOption "Disciplina witness";
+    enable = mkEnableOption "Disciplina node";
 
     type = mkOption {
       type = types.enum [ "witness" "faucet" "educator" ];
