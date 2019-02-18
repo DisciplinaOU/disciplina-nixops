@@ -13,7 +13,7 @@ in {
   };
 
   inherit (import <disciplina/release.nix> {})
-    disciplina-config disciplina-data disciplina disciplina-educator;
+    disciplina-config disciplina;
   disciplina-faucet-frontend = callPackage <disciplina-faucet-frontend/release.nix> {};
   disciplina-explorer-frontend = callPackage <disciplina-explorer-frontend/release.nix> {};
   disciplina-validatorcv = callPackage <disciplina-validatorcv/release.nix> {};

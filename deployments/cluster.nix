@@ -89,5 +89,5 @@
   witness2 = import ./cluster/witness.nix 2 "b";
   witness3 = import ./cluster/witness.nix 3 "c";
 
-  educator = import ./cluster/educator.nix "a";
+  educator = import ./cluster/educator.nix domain "a";
 }

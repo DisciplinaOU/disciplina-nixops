@@ -1,4 +1,4 @@
-zone: { lib, name, nodes, pkgs, resources, ... }: with lib;
+domain: zone: { lib, name, nodes, pkgs, resources, ... }: with lib;
 
 let
   address = ip: ip + ":4010:4011";
@@ -6,6 +6,9 @@ let
 in
 
 {
+  # Fix the redefinition of `educator` subdomain
+  deployment.route53.hostName = lib.mkForce "${name}-inner.${domain}";
+
   ##
   # `map` to make additional SGs easier to add and SG list more readable
   deployment.ec2.securityGroupIds = map (x: resources.ec2SecurityGroups."cluster-${x}-sg".name ) (

@@ -43,17 +43,25 @@ in
         maybeType = "just";
         just.addr = "0.0.0.0:4030";
       };
+      network = {
+        peers = map (node: address node.config.networking.privateIPv4)
+          (attrValues (filterAttrs (name2: node: name != name2 && hasWitnessTag node) nodes));
+        ourAddress = address "*";
+      };
+      keys.params = {
+        paramsType = "committee";
+        committee.params = {
+          paramsType = "closed";
+          participantN = n;
+        };
+      };
     };
 
     args = let
       cat = path: ''"$(cat "${path}")"'';
     in {
       inherit config-key;
-      bind = address "*";
-      comm-n = toString n;
       comm-sec = cat keys.committee-secret;
-      peer = map (node: address node.config.networking.privateIPv4)
-        (attrValues (filterAttrs (name2: node: name != name2 && hasWitnessTag node) nodes));
     };
   };
 
