@@ -84,6 +84,9 @@ in
           studentAPINoAuth.enabled = false;
           educatorAPINoAuth.enabled = false;
         };
+
+        # TODO: this path with all those versions should be de-hardcoded somehow
+        certificates.resources = "${pkgs.disciplina-data}/share/ghc-8.2.2/x86_64-linux-ghc-8.2.2/disciplina-pdfs-0.1.0.0/template";
       };
     };
 
