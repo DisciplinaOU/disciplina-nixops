@@ -23,11 +23,6 @@ in
     4040        # Educator HTTP API
   ];
 
-  # Add Xelatex to path in order to generate pdfs
-  environment.systemPackages = [
-    pkgs.pdf-generator-xelatex
-  ];
-
   services.postgresql = {
     enable = true;
     package = pkgs.postgresql_9_6;
@@ -90,8 +85,11 @@ in
           educatorAPINoAuth.enabled = false;
         };
 
-        # TODO: this path with all those versions should be de-hardcoded somehow
-        certificates.resources = "${pkgs.disciplina-data}/share/ghc-8.2.2/x86_64-linux-ghc-8.2.2/disciplina-pdfs-0.1.0.0/template";
+        certificates = {
+          latex = "${pkgs.pdf-generator-xelatex}/bin/xelatex";
+          # TODO: this path with all those versions should be de-hardcoded somehow
+          resources = "${pkgs.disciplina-data}/share/ghc-8.2.2/x86_64-linux-ghc-8.2.2/disciplina-pdfs-0.1.0.0/template";
+        };
       };
     };
 
