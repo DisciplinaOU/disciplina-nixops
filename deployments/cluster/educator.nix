@@ -23,6 +23,11 @@ in
     4040        # Educator HTTP API
   ];
 
+  # Add Xelatex to path in order to generate pdfs
+  environment.systemPackages = [
+    pkgs.pdf-generator-xelatex
+  ];
+
   services.postgresql = {
     enable = true;
     package = pkgs.postgresql_9_6;
