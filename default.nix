@@ -17,7 +17,7 @@ let
 
     uuid = "000-000-000-000";
 
-  networkExprs = [ deployment ./deployments/ci/shim.nix ];
+    networkExprs = [ deployment ./deployments/ci/shim.nix ];
   };
   # buildSystems: needed so it doesn't build the vm's etc.
   buildSystems = nixops: recurseIntoAttrs (lib.mapAttrs

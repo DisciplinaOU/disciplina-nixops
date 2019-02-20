@@ -1,10 +1,10 @@
-n: zone: { lib, name, nodes, pkgs, resources, config, ... }: with lib;
+n: zone: params@{ lib, name, nodes, pkgs, resources, config, ... }: with lib;
 
 let
+  node-type = "witness";
   keys = config.awskeys;
-  address = ip: ip + ":4010:4011";
-  hasWitnessTag = node: elem "witness" node.config.system.nixos.tags;
   isInternal = n == 0;
+  common = import ./common.nix node-type params;
 in
 
 {
@@ -28,26 +28,9 @@ in
 
   in rec {
     enable = true;
-    type = "witness";
+    type = node-type;
 
-    config."${config-key}".witness = rec {
-      appDir.param = {
-        paramType = "specific";
-        specific.path = "/var/lib/disciplina-${type}";
-      };
-      db = {
-        path = "${appDir.param.specific.path}/witness.db";
-        clean = false;
-      };
-      api.maybe = {
-        maybeType = "just";
-        just.addr = "0.0.0.0:4030";
-      };
-      network = {
-        peers = map (node: address node.config.networking.privateIPv4)
-          (attrValues (filterAttrs (name2: node: name != name2 && hasWitnessTag node) nodes));
-        ourAddress = address "*";
-      };
+    config."${config-key}".witness = common.default-witness-config // {
       keys.params = {
         paramsType = "committee";
         committee.params = {

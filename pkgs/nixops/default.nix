@@ -23,3 +23,4 @@ nixops.overrideAttrs (super: {
     wrapProgram $out/bin/nixops --prefix PATH : ${openssh}/bin
   '';
 })
+ 
