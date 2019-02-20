@@ -8,6 +8,7 @@ let
     faucet = "faucet.${domain}";
     explorer = "explorer.${domain}";
     educator = "educator.${domain}";
+    multi-educator = "multi-educator.${domain}";
     witness = "witness.${domain}";
     validator = "validator.${domain}";
   };
@@ -59,6 +60,11 @@ in
       extraConfig = "keepalive 32;";
     };
 
+    upstreams.multi-educator = {
+      servers."multi-educator:4040" = {};
+      extraConfig = "keepalive 32;";
+    };
+
     upstreams.faucet = {
       servers."127.0.0.1:4014" = {};
       extraConfig = "keepalive 32;";
@@ -67,6 +73,7 @@ in
     virtualHosts= {
       "${uris.witness}".locations."/".proxyPass = "http://witness";
       "${uris.educator}".locations."/".proxyPass = "http://educator";
+      "${uris.multi-educator}".locations."/".proxyPass = "http://multi-educator";
       "${uris.explorer}".locations = {
         "/api".proxyPass = "http://witness";
         "/".root = pkgs.disciplina-explorer-frontend.override { witnessUrl = "//${uris.witness}"; };

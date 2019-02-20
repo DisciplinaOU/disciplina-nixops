@@ -93,4 +93,6 @@
 
   educator = import ./cluster/educator.nix domain "a"
     student-api-noauth educator-api-noauth;
+
+  multi-educator = import ./cluster/multi-educator.nix domain "a";
 }

@@ -32,7 +32,7 @@ in
     };
   };
 
-  default-educator-config = witness: student-api-noauth: educator-api-noauth: {
+  default-educator-config = witness: bot-enabled: student-api-noauth: educator-api-noauth: {
     publishing.period = "30s";
     db = {
       connString = "postgresql://disciplina@/disciplina";
@@ -48,19 +48,23 @@ in
     api = {
       serverParams.addr = "0.0.0.0:4040";
       botConfig.params = {
-        paramsType = "enabled";
-        enabled = {
+        paramsType = if bot-enabled then "enabled" else "disabled";
+        enabled = if bot-enabled then {
           operationsDelay = "3s";
           seed = "super secure"; # this is not sensitive data (https://serokell.slack.com/archives/CC92X27D3/p1542652947445200)
-        };
+        } else {};
       };
-      studentAPINoAuth = let isEnabled = student-api-noauth != ""; in {
-        enabled = isEnabled;
-        data = mkIf isEnabled student-api-noauth;
+      studentAPINoAuth = if student-api-noauth != "" then {
+        enabled = true;
+        data = student-api-noauth;
+      } else {
+        enabled = false;
       };
-      educatorAPINoAuth = {
-        enabled = educator-api-noauth;
-        data = mkIf educator-api-noauth [];
+      educatorAPINoAuth = if educator-api-noauth then {
+        enabled = true;
+        data = [];
+      } else {
+        enabled = false;
       };
     };
 
