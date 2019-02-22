@@ -38,6 +38,8 @@ in
     type = node-type;
 
     config."${config-key}" = rec {
+      inherit (common.zero-pub-fees) core;
+
       witness = common.default-witness-config;
       educator = common.default-educator-config witness false "" false // {
         keys = "${witness.appDir.param.specific.path}/multieducator";

@@ -30,12 +30,16 @@ in
     enable = true;
     type = node-type;
 
-    config."${config-key}".witness = common.default-witness-config // {
-      keys.params = {
-        paramsType = "committee";
-        committee.params = {
-          paramsType = "closed";
-          participantN = n;
+    config."${config-key}" = {
+      inherit (common.zero-pub-fees) core;
+
+      witness = common.default-witness-config // {
+        keys.params = {
+          paramsType = "committee";
+          committee.params = {
+            paramsType = "closed";
+            participantN = n;
+          };
         };
       };
     };

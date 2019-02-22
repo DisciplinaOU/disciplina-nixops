@@ -5,6 +5,14 @@ let
   hasWitnessTag = node: elem "witness" node.config.system.nixos.tags;
 in
 {
+  zero-pub-fees.core.fee.publication = {
+    type = "linear";
+    coeffs = {
+      minimal = 0;
+      multiplier = 0;
+    };
+  };
+
   default-witness-config = rec {
     appDir.param = {
       paramType = "specific";
