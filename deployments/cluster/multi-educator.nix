@@ -1,9 +1,9 @@
-domain: zone: student-api-noauth: educator-api-noauth:
+domain: zone:
 params@{ lib, name, nodes, pkgs, resources, ... }:
 
 with lib;
 let
-  node-type = "educator";
+  node-type = "multi-educator";
   common = import ./common.nix node-type params;
 in
 
@@ -41,8 +41,13 @@ in
       inherit (common.zero-pub-fees) core;
 
       witness = common.default-witness-config;
-      educator = common.default-educator-config witness
-        true student-api-noauth educator-api-noauth;
+      educator = common.default-educator-config witness false "" false // {
+        keys = "${witness.appDir.param.specific.path}/multieducator";
+        aaa = {
+          serviceUrl = "https://stage-teachmeplease-aaa.stage.tchmpls.com";
+          publicKey = "2gSNy2wKSaI4YtGZe_Eaxsdv_BLCfi5kkT9xvxt_O0k";
+        };
+      };
     };
 
     args = {
@@ -55,5 +60,5 @@ in
     };
   };
 
-  system.nixos.tags = [ "educator" "witness" ];
+  system.nixos.tags = [ "multi-educator" "witness" ];
 }

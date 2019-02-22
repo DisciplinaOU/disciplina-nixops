@@ -18,7 +18,7 @@ in
     enable = mkEnableOption "Disciplina node";
 
     type = mkOption {
-      type = types.enum [ "witness" "faucet" "educator" ];
+      type = types.enum [ "witness" "faucet" "educator" "multi-educator" ];
       default = "witness";
       description = ''
         The type of node to spawn. Sets the systemd unit name to

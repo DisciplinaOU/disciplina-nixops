@@ -4,6 +4,8 @@
 , env ? "staging"
 , domain ? "see-readme.dscp.serokell.review"
 , hostType ? "ec2"
+, student-api-noauth ? ""
+, educator-api-noauth ? false
 , pkgs ? import ../pkgs.nix
 , ...}:
 
@@ -89,5 +91,8 @@
   witness2 = import ./cluster/witness.nix 2 "b";
   witness3 = import ./cluster/witness.nix 3 "c";
 
-  educator = import ./cluster/educator.nix domain "a";
+  educator = import ./cluster/educator.nix domain "a"
+    student-api-noauth educator-api-noauth;
+
+  multi-educator = import ./cluster/multi-educator.nix domain "a";
 }
