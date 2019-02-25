@@ -75,9 +75,12 @@ in
       "${uris.educator}".locations."/".proxyPass = "http://educator";
       "${uris.multi-educator}".locations = {
         "/api".proxyPass = "http://multi-educator";
-        "/".root = pkgs.disciplina-educator-spa.override {
-          aaaUrl = "https://stage-teachmeplease-aaa.stage.tchmpls.com";
-          educatorUrl = "//${uris.multi-educator}";
+        "/" = {
+          root = pkgs.disciplina-educator-spa.override {
+            aaaUrl = "https://stage-teachmeplease-aaa.stage.tchmpls.com";
+            educatorUrl = "//${uris.multi-educator}";
+          };
+          tryFiles = "$uri /index.html";
         };
       };
       "${uris.explorer}".locations = {
