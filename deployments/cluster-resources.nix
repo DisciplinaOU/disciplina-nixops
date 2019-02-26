@@ -1,6 +1,7 @@
 { region ? "eu-central-1"
 , clusterIndex
 , dnsZone ? "disciplina.io."
+, env ? "staging"
 , domain
 , vpcId ? null
 , vpcCidr ? null
@@ -38,13 +39,12 @@ in
         # ssh-from-deployer-sg            = fromSubnet "deployer-subnet" [ 22 ];
       };
 
-      route53RecordSets = with dns domain; {
+      route53RecordSets = if (env != "production") (with dns domain; {
         rs-faucet         = cname "faucet.${domain}"   "witness.${domain}";
         rs-explorer       = cname "explorer.${domain}" "witness.${domain}";
         rs-educator       = cname "educator.${domain}" "witness.${domain}";
         rs-multi-educator = cname "multi-educator.${domain}" "witness.${domain}";
         rs-validator      = cname "validator.${domain}" "witness.${domain}";
-      };
-
+      }) else {};
     };
   }
