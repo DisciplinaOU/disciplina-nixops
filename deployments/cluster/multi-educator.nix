@@ -4,7 +4,7 @@ params@{ lib, name, nodes, pkgs, resources, ... }:
 with lib;
 let
   node-type = "multi-educator";
-  common = import ./common.nix node-type params;
+  common = import ./common.nix node-type domain params;
 in
 
 {

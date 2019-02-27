@@ -39,7 +39,7 @@ in
         # ssh-from-deployer-sg            = fromSubnet "deployer-subnet" [ 22 ];
       };
 
-      route53RecordSets = if (env != "production") (with dns domain; {
+      route53RecordSets = if (env != "production") then (with dns domain; {
         rs-faucet         = cname "faucet.${domain}"   "witness.${domain}";
         rs-explorer       = cname "explorer.${domain}" "witness.${domain}";
         rs-educator       = cname "educator.${domain}" "witness.${domain}";
