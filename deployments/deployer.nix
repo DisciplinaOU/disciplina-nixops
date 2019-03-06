@@ -92,7 +92,7 @@ in {
       associatePublicIpAddress = true;
       subnetId = vpcSubnets.deployer-subnet;
       securityGroupIds = with ec2SecurityGroups;
-        [ ssh-public-sg.name ];
+        [ ssh-public-sg.name mosh-public-sg.name ];
     };
 
     deployment.route53 = {
@@ -154,6 +154,9 @@ in {
         unset secrets
       '';
     };
+
+    # Enables `mosh` for more comfortable connection to deployer via SSH
+    programs.mosh.enable = true;
 
     users.extraGroups.nixops = {};
     users.mutableUsers = false;

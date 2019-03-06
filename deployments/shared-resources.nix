@@ -25,6 +25,7 @@ in
 
     ec2SecurityGroups = with sg "shared-vpc"; {
       ssh-public-sg         = public [ 22 ];
+      mosh-public-sg        = publicRanges [{ from = 60000; to = 61000; protocol = "udp"; }];
     };
   };
 }

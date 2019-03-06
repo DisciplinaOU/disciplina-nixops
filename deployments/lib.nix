@@ -28,6 +28,14 @@ rec {
   # DSL to declare Security Groups.
   sg = vpc: {
 
+    # Declare an SG that accepts connections from ranges of ports
+    publicRanges = ranges: (withVPC vpc {
+      rules = map
+        ({ from, to, protocol ? "tcp" }:
+         { toPort = to; fromPort = from; protocol = protocol; sourceIp = "0.0.0.0/0"; }
+        ) ranges;
+    });
+
     # Declare an SG that accepts connections from anywhere
     public = ports: (withVPC vpc {
       rules = map (x: { toPort = x; fromPort = x; sourceIp = "0.0.0.0/0"; }) ports;
