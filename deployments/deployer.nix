@@ -31,11 +31,7 @@ let
   '';
 
   buildkiteAgentName = "default";
-  getBuildkiteSecrets = pkgs.writeScript "getBuildkiteSecrets" ''
-    #!${pkgs.bash}/bin/bash
-    ${pkgs.awscli}/bin/aws secretsmanager get-secret-value --secret-id production/disciplina/buildkite --region eu-central-1 \
-      | ${pkgs.jq}/bin/jq -r .SecretString
-  '';
+  buildkiteAgentUserName = "buildkite-agent-${buildkiteAgentName}";
 
   nixopsWrapper =
   let
@@ -80,6 +76,8 @@ in {
   require = [ ./shared-resources.nix ];
 
   deployer = { config, name, resources, ... }: {
+    imports = [ ../modules ];
+
     deployment.targetEnv = "ec2";
 
     deployment.ec2 = with resources; {
@@ -92,7 +90,7 @@ in {
       associatePublicIpAddress = true;
       subnetId = vpcSubnets.deployer-subnet;
       securityGroupIds = with ec2SecurityGroups;
-        [ ssh-public-sg.name ];
+        [ ssh-public-sg.name mosh-public-sg.name ];
     };
 
     deployment.route53 = {
@@ -130,7 +128,22 @@ in {
 
     nixpkgs.pkgs = pkgs;
 
-    services.buildkite-agents.${buildkiteAgentName} = {
+    awskeys =
+    let
+      buildkiteKeyCommon = {
+        inherit region;
+        user = buildkiteAgentUserName;
+        services = [ buildkiteAgentUserName ];
+        secretId = "production/disciplina/buildkite";
+      };
+    in {
+      agent-token        = buildkiteKeyCommon // { key = "AgentToken"; };
+      api-access-token   = buildkiteKeyCommon // { key = "APIAccessToken"; };
+      cachix-signing-key = buildkiteKeyCommon // { key = "CachixSigningKey"; };
+      buildkite-ssh-key  = buildkiteKeyCommon // { key = "BuildkiteSSHKeys.${buildkiteAgentName}"; };
+    };
+
+    services.buildkite-agents.${buildkiteAgentName} = let keys = config.awskeys; in {
       enable = env != "bootstrap";
 
       runtimePackages = with pkgs; [ bash gnutar nix-with-cachix jq ];
@@ -138,22 +151,19 @@ in {
       tags.hostname = config.networking.hostName;
       tags.system = pkgs.system;
 
-      # tokenPath is cat'd into the buildkite config file, as root
-      # https://github.com/serokell/nixpkgs/blob/e68ada3bfc8142ca94526cd5f39fcc58e57b85a4/nixos/modules/services/continuous-integration/buildkite-agents.nix#L258
-      # token="$(cat ${toString cfg.tokenPath})"
-      # but there is a check that it is a path (starts with a /)
-      # long-term, we should probably add a tokenCommand
-      tokenPath = "/dev/null <(${getBuildkiteSecrets} | jq -r .AgentToken)";
-      # :)
+      tokenPath = toString keys.agent-token;
+      sshKeyPath = toString keys.buildkite-ssh-key;
 
       hooks.environment = ''
-        secrets="$(/run/wrappers/bin/sudo ${getBuildkiteSecrets})"
-        export BUILDKITE_API_TOKEN=$(echo "$secrets" | jq -r .APIAccessToken)
-        export CACHIX_SIGNING_KEY=$(echo "$secrets" | jq -r .CachixSigningKey)
+        export BUILDKITE_API_TOKEN=$(cat ${toString keys.api-access-token})
+        export CACHIX_SIGNING_KEY=$(cat ${toString keys.cachix-signing-key})
         export CACHIX_NAME=disciplina
         unset secrets
       '';
     };
+
+    # Enables `mosh` for more comfortable connection to deployer via SSH
+    programs.mosh.enable = true;
 
     users.extraGroups.nixops = {};
     users.mutableUsers = false;
@@ -196,14 +206,6 @@ in {
           ];
           runAs = "root";
           users = [ "nixops" ];
-        }
-        {
-          commands = [
-            { command = toString getBuildkiteSecrets;
-              options = [ "NOSETENV" "NOPASSWD" ]; }
-          ];
-          runAs = "root";
-          users = [ "buildkite-agent-${buildkiteAgentName}" ];
         }
       ];
       extraConfig = ''

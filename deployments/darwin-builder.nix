@@ -35,6 +35,10 @@ in
       tags.system = pkgs.system;
       runtimePackages = with pkgs; [ bash gnutar nix-with-cachix ];
       tokenPath = "${secrets}/buildkite-token";
+      openssh = {
+        publicKeyPath = "${secrets}/buildkite_darwin_rsa.pub";
+        privateKeyPath = "${secrets}/buildkite_darwin_rsa";
+      };
 
       # TODO: move to nix-darwin
       extraConfig = ''
