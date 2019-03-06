@@ -94,8 +94,10 @@ are used:
 - `<env>/disciplina/cluster` is used by the cluster. It should be a JSON object
   containing the following keys: `CommitteeSecret` and `FaucetKey`.
 - `<env>/disciplina/buildkite` is used by the buildkite agent. It should be a
-  JSON object containing the following keys: `AgentToken`, `APIAccessToken` and
-  `CachixSigningKey`.
+  JSON object containing the following keys: `AgentToken`, `APIAccessToken`,
+  `CachixSigningKey` and `BuildkiteSSHKeys`. `BuildkiteSSHKeys` is an object
+  where keys are names of buildkite agents (e. g. `default`), and values are
+  private SSH RSA keys used by those agents.
 
 ## Setting up continuous delivery
 
