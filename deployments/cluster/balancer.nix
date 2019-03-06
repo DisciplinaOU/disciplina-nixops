@@ -73,7 +73,16 @@ in
     virtualHosts= {
       "${uris.witness}".locations."/".proxyPass = "http://witness";
       "${uris.educator}".locations."/".proxyPass = "http://educator";
-      "${uris.multi-educator}".locations."/".proxyPass = "http://multi-educator";
+      "${uris.multi-educator}".locations = {
+        "/api".proxyPass = "http://multi-educator";
+        "/" = {
+          root = pkgs.disciplina-educator-spa.override {
+            aaaUrl = "https://stage-teachmeplease-aaa.stage.tchmpls.com";
+            educatorUrl = "//${uris.multi-educator}";
+          };
+          tryFiles = "$uri /index.html";
+        };
+      };
       "${uris.explorer}".locations = {
         "/api".proxyPass = "http://witness";
         "/".root = pkgs.disciplina-explorer-frontend.override { witnessUrl = "//${uris.witness}"; };

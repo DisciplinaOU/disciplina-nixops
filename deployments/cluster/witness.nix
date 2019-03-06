@@ -4,7 +4,7 @@ let
   node-type = "witness";
   keys = config.awskeys;
   isInternal = n == 0;
-  common = import ./common.nix node-type params;
+  common = import ./common.nix node-type "" params;
 in
 
 {

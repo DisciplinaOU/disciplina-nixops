@@ -23,4 +23,5 @@ nixops modify \
 	-Idisciplina-faucet-frontend="${prefix}disciplina-faucet-frontend${postfix}" \
 	-Idisciplina-nixops="${prefix}disciplina-nixops${postfix}" \
 	-Idisciplina-validatorcv="${prefix}disciplina-validatorcv${postfix}" \
+	-Idisciplina-educator-spa="${prefix}disciplina-educator-spa${postfix}" \
 	"${@:3}"
