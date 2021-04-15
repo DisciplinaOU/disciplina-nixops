@@ -14,7 +14,7 @@ let
     });
 
   inherit (pkgs) lib;
-  wheelUsers = [ "chris" "kirelagin" "lars" "yorick" "dboulas" "flyingleafe" ];
+  wheelUsers = [ "dboulas" "flyingleafe" ];
   nixopsUsers = wheelUsers ++ [ ];
   expandUser = _name: keys: {
     extraGroups = [ "systemd-journal" ]
@@ -77,6 +77,8 @@ in {
 
   deployer = { config, name, resources, ... }: {
     imports = [ ../modules ];
+
+    # boot.kernelPackages = pkgs.linuxPackages_4_9;
 
     deployment.targetEnv = "ec2";
 
