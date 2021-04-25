@@ -20,7 +20,7 @@ in
     };
     db = {
       path = "${appDir.param.specific.path}/witness.db";
-      clean = false;
+      clean = true;
     };
     api.maybe = {
       maybeType = "just";

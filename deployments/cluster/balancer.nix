@@ -83,9 +83,12 @@ in
           tryFiles = "$uri /index.html";
         };
       };
-      "${uris.explorer}".locations = {
-        "/api".proxyPass = "http://witness";
-        "/".root = pkgs.disciplina-explorer-frontend.override { witnessUrl = "//${uris.witness}"; };
+      "${uris.explorer}" = {
+        locations = {
+          "/api".proxyPass = "http://witness";
+          "/".root = pkgs.disciplina-explorer-frontend.override { witnessUrl = "//${uris.witness}"; };
+        };
+        default = true;
       };
 
       "${uris.faucet}".locations = {
