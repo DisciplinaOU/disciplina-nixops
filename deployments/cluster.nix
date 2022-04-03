@@ -72,24 +72,24 @@
         key = "CommitteeSecret";
       };
 
-      faucet-key = {
-        inherit region;
-        user = "disciplina";
-        services = [ "disciplina-faucet" ];
-        secretId = "${env}/disciplina/cluster";
-        permissions = "400";
-        key = "FaucetKey";
-        transform = "${pkgs.disciplina}/bin/dscp-keygen --secret keyfile";
-      };
+      # faucet-key = {
+      #   inherit region;
+      #   user = "disciplina";
+      #   services = [ "disciplina-faucet" ];
+      #   secretId = "${env}/disciplina/cluster";
+      #   permissions = "400";
+      #   key = "FaucetKey";
+      #   transform = "${pkgs.disciplina}/bin/dscp-keygen --secret keyfile";
+      # };
     };
   };
 
   balancer = import ./cluster/balancer.nix env domain "a";
 
-  witness0 = import ./cluster/witness.nix 0 "a";
-  witness1 = import ./cluster/witness.nix 1 "a";
-  witness2 = import ./cluster/witness.nix 2 "b";
-  witness3 = import ./cluster/witness.nix 3 "c";
+  # witness0 = import ./cluster/witness.nix 0 "a";
+  # witness1 = import ./cluster/witness.nix 1 "a";
+  # witness2 = import ./cluster/witness.nix 2 "b";
+  # witness3 = import ./cluster/witness.nix 3 "c";
 
   educator = import ./cluster/educator.nix domain "a"
     student-api-noauth educator-api-noauth;

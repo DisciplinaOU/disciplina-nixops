@@ -18,10 +18,10 @@ prefix="$1"
 postfix="$2"
 
 nixops modify \
-	-Idisciplina="${prefix}disciplina${postfix}" \
-	-Idisciplina-explorer-frontend="${prefix}disciplina-explorer-frontend${postfix}" \
-	-Idisciplina-faucet-frontend="${prefix}disciplina-faucet-frontend${postfix}" \
-	-Idisciplina-nixops="${prefix}disciplina-nixops${postfix}" \
-	-Idisciplina-validatorcv="${prefix}disciplina-validatorcv${postfix}" \
-	-Idisciplina-educator-spa="https://github.com/DisciplinaOU/disciplina-educator-spa/archive/develop.tar.gz" \
-	"${@:3}"
+  -Idisciplina="${prefix}disciplina/archive/new-web3.tar.gz" \
+  # -Idisciplina-explorer-frontend="${prefix}disciplina-explorer-frontend${postfix}" \
+  # -Idisciplina-faucet-frontend="${prefix}disciplina-faucet-frontend${postfix}" \
+  -Idisciplina-nixops="${prefix}disciplina-nixops/archive/new-web3.tar.gz" \
+  -Idisciplina-validatorcv="${prefix}disciplina-validatorcv/archive/master.tar.gz" \
+  -Idisciplina-educator-spa="https://github.com/DisciplinaOU/disciplina-educator-spa/archive/develop.tar.gz" \
+  "${@:3}"

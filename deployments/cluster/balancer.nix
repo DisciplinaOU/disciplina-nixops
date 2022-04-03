@@ -5,12 +5,12 @@ env: domain: zone: { config, lib, pkgs, resources, ... }:
 let
   keys = config.awskeys;
   uris = {
-    faucet = "faucet.${domain}";
-    explorer = "explorer.${domain}";
+    # faucet = "faucet.${domain}";
+    # explorer = "explorer.${domain}";
     educator = "educator.${domain}";
     multi-educator = "multi-educator.${domain}";
-    witness = "witness.${domain}";
-    validator = "validator.${domain}";
+    # witness = "witness.${domain}";
+    # validator = "validator.${domain}";
   };
 in
 {
@@ -42,19 +42,6 @@ in
       access_log syslog:server=unix:/dev/log,tag=nginx,severity=info combined;
     '';
 
-    upstreams.witness = {
-      servers = {
-        "witness1:4030" = {};
-        "witness2:4030" = {};
-        "witness3:4030" = {};
-      };
-
-      extraConfig = ''
-        ip_hash;
-        keepalive 32;
-      '';
-    };
-
     upstreams.educator = {
       servers."educator:4040" = {};
       extraConfig = "keepalive 32;";
@@ -65,13 +52,7 @@ in
       extraConfig = "keepalive 32;";
     };
 
-    upstreams.faucet = {
-      servers."127.0.0.1:4014" = {};
-      extraConfig = "keepalive 32;";
-    };
-
     virtualHosts= {
-      "${uris.witness}".locations."/".proxyPass = "http://witness";
       "${uris.educator}".locations."/".proxyPass = "http://educator";
       "${uris.multi-educator}".locations = {
         "/api".proxyPass = "http://multi-educator";
@@ -83,50 +64,10 @@ in
           tryFiles = "$uri /index.html";
         };
       };
-      "${uris.explorer}" = {
-        locations = {
-          "/api".proxyPass = "http://witness";
-          "/".root = pkgs.disciplina-explorer-frontend.override { witnessUrl = "//${uris.witness}"; };
-        };
-        default = true;
-      };
 
-      "${uris.faucet}".locations = {
-        "= /api/faucet/v1/".index = "index.html";
-        "/api".proxyPass = "http://faucet";
-        "/".root = pkgs.disciplina-faucet-frontend.override { faucetUrl = "//${uris.faucet}"; };
-      };
-
-      "${uris.validator}".locations = {
-        "/".root = pkgs.disciplina-validatorcv.override { witnessUrl = "//${uris.witness}"; };
-      };
-    };
-  };
-
-  services.disciplina = let
-    config-key = "alpha";
-    getSecret = k: ''"$(aws secretsmanager get-secret-value --secret-id ${env}/disciplina/cluster | jq -r .SecretString)"'';
-
-  in rec {
-    enable = true;
-    type = "faucet";
-
-    config."${config-key}".faucet = {
-      appDir.param = {
-        paramType = "specific";
-        specific.path = "/var/lib/disciplina-${type}";
-      };
-      api.addr = "127.0.0.1:4014";
-      witnessBackend = "http://witness1:4030";
-      transferredAmount = 20;
-      keys = {
-        path = toString keys.faucet-key;
-        genNew = false;
-      };
-    };
-
-    args = {
-      inherit config-key;
+      # "${uris.validator}".locations = {
+      #   "/".root = pkgs.disciplina-validatorcv.override { witnessUrl = "//${uris.multi-educator}"; };
+      # };
     };
   };
 }

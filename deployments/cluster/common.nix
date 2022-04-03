@@ -79,7 +79,7 @@ in
     certificates = {
       latex = "${pkgs.pdf-generator-xelatex}/bin/xelatex";
       # TODO: this path with all those versions should be de-hardcoded somehow
-      resources = "${pkgs.disciplina-data}/share/ghc-8.2.2/x86_64-linux-ghc-8.2.2/disciplina-pdfs-0.1.0.0/template";
+      resources = "${pkgs.disciplina-data}/x86_64-linux-ghc-8.10.7/disciplina-pdfs-0.1.0.0/template";
       downloadBaseUrl = "https://${type}.${domain}/api/certificates/v1/cert";
       issuer = {
         name = "Disciplina Educator Bot";

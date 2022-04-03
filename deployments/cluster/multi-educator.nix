@@ -14,33 +14,31 @@ in
   ##
   # `map` to make additional SGs easier to add and SG list more readable
   deployment.ec2.securityGroupIds = map (x: resources.ec2SecurityGroups."cluster-${x}-sg".name ) (
-    [ "educator-api-private" "witness-public" ]
+    [ "educator-api-private" ]
   );
 
   deployment.ec2.subnetId = lib.mkForce resources.vpcSubnets."${zone}-subnet";
 
   networking.firewall.allowedTCPPorts = [
-    4010 4011   # Witness ZMQ API
-    4030        # Witness HTTP Wallet API
+    # 4010 4011   # Witness ZMQ API
+    # 4030        # Witness HTTP Wallet API
     4040        # Educator HTTP API
   ];
 
   services.postgresql = {
     enable = true;
-    package = pkgs.postgresql_9_6;
+    package = pkgs.postgresql;
   };
 
   services.disciplina = let
-    config-key = "alpha";
+    config-key = "new-web3";
+    witness = common.default-witness-config;
 
   in rec {
     enable = true;
     type = node-type;
 
-    config."${config-key}" = rec {
-      inherit (common.zero-pub-fees) core;
-
-      witness = common.default-witness-config;
+    config."${config-key}" = {
       educator = common.default-educator-config witness false "" false // {
         keys = "${witness.appDir.param.specific.path}/multieducator";
         aaa = {
@@ -60,5 +58,5 @@ in
     };
   };
 
-  system.nixos.tags = [ "multi-educator" "witness" ];
+  system.nixos.tags = [ "multi-educator" ];
 }
