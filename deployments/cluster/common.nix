@@ -43,7 +43,7 @@ in
   default-educator-config = witness: bot-enabled: student-api-noauth: educator-api-noauth: {
     publishing.period = "30s";
     db = {
-      connString = "postgresql://disciplina@/disciplina";
+      connString = "postgresql://disciplina@/disciplina?host=/tmp";
       connNum = 4;
       maxPending = 100;
     };

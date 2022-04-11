@@ -10,7 +10,7 @@ let
     educator = "educator.${domain}";
     multi-educator = "multi-educator.${domain}";
     # witness = "witness.${domain}";
-    # validator = "validator.${domain}";
+    validator = "validator.${domain}";
   };
 in
 {
@@ -65,9 +65,9 @@ in
         };
       };
 
-      # "${uris.validator}".locations = {
-      #   "/".root = pkgs.disciplina-validatorcv.override { witnessUrl = "//${uris.multi-educator}"; };
-      # };
+      "${uris.validator}".locations = {
+        "/".root = pkgs.disciplina-validatorcv.override { witnessUrl = "//${uris.multi-educator}"; };
+      };
     };
   };
 }

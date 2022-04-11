@@ -53,5 +53,5 @@ in
     };
   };
 
-  system.nixos.tags = [ "educator" "witness" ];
+  system.nixos.tags = [ "educator" ];
 }
