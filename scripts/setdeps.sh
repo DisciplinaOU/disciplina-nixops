@@ -18,8 +18,9 @@ prefix="$1"
 postfix="$2"
 
 nixops modify \
+  -Imetamask-auth-service="https://github.com/DisciplinaOU/metamask-auth-service/archive/master.tar.gz" \
   -Idisciplina="${prefix}disciplina/archive/new-web3.tar.gz" \
   -Idisciplina-nixops="${prefix}disciplina-nixops/archive/new-web3.tar.gz" \
   -Idisciplina-validatorcv="${prefix}disciplina-validatorcv/archive/master.tar.gz" \
-  -Idisciplina-educator-spa="https://github.com/DisciplinaOU/disciplina-educator-spa/archive/develop.tar.gz" \
+  -Idisciplina-educator-spa="https://github.com/DisciplinaOU/disciplina-educator-spa/archive/new-web3.tar.gz" \
   "${@:3}"

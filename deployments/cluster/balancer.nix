@@ -1,6 +1,6 @@
 # TODO: add AWS ALB to NixOps and use that instead
 
-env: domain: zone: { config, lib, pkgs, resources, ... }:
+env: domain: zone: params@{ config, lib, pkgs, resources, ... }:
 
 let
   keys = config.awskeys;
@@ -11,7 +11,9 @@ let
     multi-educator = "multi-educator.${domain}";
     # witness = "witness.${domain}";
     validator = "validator.${domain}";
+    auth = "auth.${domain}";
   };
+  common = import ./common.nix "" "" params;
 in
 {
   deployment.route53.hostName = lib.mkForce "witness.${domain}";
@@ -52,22 +54,59 @@ in
       extraConfig = "keepalive 32;";
     };
 
+    upstreams.auth = {
+      servers."localhost:8000" = {};
+      extraConfig = "keepalive 32;";
+    };
+
     virtualHosts= {
       "${uris.educator}".locations."/".proxyPass = "http://educator";
       "${uris.multi-educator}".locations = {
         "/api".proxyPass = "http://multi-educator";
         "/" = {
           root = pkgs.disciplina-educator-spa.override {
-            aaaUrl = "https://stage-teachmeplease-aaa.stage.tchmpls.com";
+            aaaUrl = "//${uris.auth}";
             educatorUrl = "//${uris.multi-educator}";
           };
           tryFiles = "$uri /index.html";
         };
       };
 
+      "${uris.auth}".locations."/".proxyPass = "http://auth";
+
       "${uris.validator}".locations = {
         "/".root = pkgs.disciplina-validatorcv.override { witnessUrl = "//${uris.multi-educator}"; };
       };
     };
+  };
+
+  services.postgresql = {
+    enable = true;
+    package = pkgs.postgresql;
+  };
+
+  systemd.services.metamask-auth = {
+    description = "Hello world application";
+
+    after = [ "network.target" ];
+    wantedBy = [ "multi-user.target" ];
+
+    # We're going to run it on port 8000 in production
+    environment = {
+      PORT = "8000";
+      PSQL_CONN_STRING = "postgresql://disciplina@/disciplina?host=/tmp";
+      AUTH_SECRET_PATH = ../../secret.pem;   # SHOULD BE PUT MANUALLY ON DEPLOYER BEFORE DEPLOYMENT
+    };
+    serviceConfig = {
+      ExecStartPre = common.postres-pre-start;
+      ExecStart = "${pkgs.nodejs-16_x}/bin/node ${pkgs.metamask-auth-service}";
+      # For security reasons we'll run this process as a special 'nodejs' user
+      User = "nodejs";
+      Restart = "always";
+    };
+  };
+
+  users.extraUsers = {
+    nodejs = {};
   };
 }

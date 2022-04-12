@@ -14,8 +14,11 @@ in {
 
   inherit (import <disciplina/release.nix> {})
     disciplina-config disciplina-data disciplina pdf-generator-xelatex;
+  inherit (import <metamask-auth-service/deploy.nix> {})
+    metamask-auth-service nodejs-16_x;
+
   # disciplina-faucet-frontend = callPackage <disciplina-faucet-frontend/release.nix> {};
   # disciplina-explorer-frontend = callPackage <disciplina-explorer-frontend/release.nix> {};
   disciplina-validatorcv = callPackage <disciplina-validatorcv/release.nix> {};
-  disciplina-educator-spa = callPackage <disciplina-educator-spa/release.nix> {};
+  disciplina-educator-spa = import <disciplina-educator-spa> {};
 }

@@ -45,6 +45,7 @@ in
         rs-educator       = cname "educator.${domain}" "witness.${domain}";
         rs-multi-educator = cname "multi-educator.${domain}" "witness.${domain}";
         rs-validator      = cname "validator.${domain}" "witness.${domain}";
+        rs-auth           = cname "auth.${domain}" "witness.${domain}";
       }) else {};
     };
   }

@@ -42,8 +42,8 @@ in
       educator = common.default-educator-config witness false "" false // {
         keys = "${witness.appDir.param.specific.path}/multieducator";
         aaa = {
-          serviceUrl = "https://stage-teachmeplease-aaa.stage.tchmpls.com";
-          publicKey = "2gSNy2wKSaI4YtGZe_Eaxsdv_BLCfi5kkT9xvxt_O0k";
+          serviceUrl = "https://auth.${domain}";
+          publicKey = "fAc_hcle5psCxGio6cBjs2BRekX29iwg2JdA97JH-HM";
         };
       };
     };
