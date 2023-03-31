@@ -1,6 +1,6 @@
 # TODO: add AWS ALB to NixOps and use that instead
 
-env: domain: zone: params@{ config, lib, pkgs, resources, ... }:
+env: domain: zone: params@{ config, lib, name, nodes, pkgs, resources, ... }:
 
 let
   keys = config.awskeys;
@@ -74,8 +74,12 @@ in
 
       "${uris.auth}".locations."/".proxyPass = "http://auth";
 
-      "${uris.validator}".locations = {
-        "/".root = pkgs.disciplina-validatorcv.override { witnessUrl = "//${uris.multi-educator}"; };
+      "${uris.validator}" = {
+        locations = {
+	  "/api".proxyPass = "http://multi-educator";
+          "/".root = pkgs.disciplina-validatorcv.override { witnessUrl = "//${uris.multi-educator}"; };
+        };
+        default = true;
       };
     };
   };
@@ -88,7 +92,7 @@ in
   systemd.services.metamask-auth = {
     description = "Hello world application";
 
-    after = [ "network.target" ];
+    after = [ "network.target" "postgresql.service" ];
     wantedBy = [ "multi-user.target" ];
 
     # We're going to run it on port 8000 in production
@@ -98,15 +102,18 @@ in
       AUTH_SECRET_PATH = ../../secret.pem;   # SHOULD BE PUT MANUALLY ON DEPLOYER BEFORE DEPLOYMENT
     };
     serviceConfig = {
-      ExecStartPre = common.postres-pre-start;
+      ExecStartPre = common.postgres-pre-start;
       ExecStart = "${pkgs.nodejs-16_x}/bin/node ${pkgs.metamask-auth-service}";
       # For security reasons we'll run this process as a special 'nodejs' user
-      User = "nodejs";
+      User = "disciplina";
       Restart = "always";
     };
   };
 
   users.extraUsers = {
-    nodejs = {};
+    disciplina = {
+      extraGroups = [ "keys" ];
+      isSystemUser = true;
+    };
   };
 }

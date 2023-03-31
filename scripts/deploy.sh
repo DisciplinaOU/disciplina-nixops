@@ -30,7 +30,7 @@ export NIXOPS_DEPLOYMENT="$dep"
 
 declare -a NIXOPS_OPTIONS MACHINES STAGE2
 NIXOPS_OPTIONS=( --show-trace )
-MACHINES=( balancer educator multi-educator witness0 witness1 witness2 witness3 )
+MACHINES=( balancer educator multi-educator )
 STAGE2=( a-assoc b-assoc c-assoc )
 
 nixops deploy "${NIXOPS_OPTIONS[@]}" --exclude "${MACHINES[@]}" "${STAGE2[@]}"
