@@ -106,7 +106,7 @@ in
       EMAIL_FROM = "test@stablewatch.io";
       EMAIL_NAME = "Stable Watches";
       FRONTEND_BASEURL = "https://multi-educator.watches.disciplina.io";
-      ETH_PROVIDER_URL = "https://sepolia.infura.io/v3/${cat keys.infura-key}";
+      ETH_PROVIDER_URL = "https://sepolia.infura.io/v3/${builtins.readFile keys.infura-key}";
       CERTGEN_API_URL  = "http://multi-educator:4040/api/educator/v1";
       DISCIPLINA_CONTRACT = "0xd25dB49fa9f9b27Ffe7B016395CEC704Ca650a8F";
       WALLET_SECRET = "wallet123123123";
