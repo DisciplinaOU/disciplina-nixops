@@ -72,6 +72,14 @@
         key = "CommitteeSecret";
       };
 
+      infura-key = {
+        inherit region;
+        user = "disciplina";
+        services = [ "custodial-wallet" ];
+        secretId = "${env}/disciplina/infura";
+        key = "InfuraAPIKey";
+      };
+
       # faucet-key = {
       #   inherit region;
       #   user = "disciplina";

@@ -18,7 +18,7 @@ prefix="$1"
 postfix="$2"
 
 nixops modify \
-  -Imetamask-auth-service="https://github.com/DisciplinaOU/metamask-auth-service/archive/prebuilt.tar.gz" \
+  -Icustodial-wallet-api="https://github.com/DisciplinaOU/custodial-wallet-api/archive/prebuilt.tar.gz" \
   -Idisciplina="${prefix}disciplina/archive/watches.tar.gz" \
   -Idisciplina-nixops="${prefix}disciplina-nixops/archive/watches.tar.gz" \
   -Idisciplina-validatorcv="${prefix}disciplina-validatorcv/archive/master.tar.gz" \
